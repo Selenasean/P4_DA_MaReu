@@ -19,6 +19,10 @@ public class MeetingsViewModel extends ViewModel {
         mListMutableLiveData.setValue(mRepository.getMeetings());
     }
 
+    /**
+     * Get all meetings
+     * @return List of meetings type LiveData
+     */
     public LiveData<List<Meeting>> getMeetings(){
         return mListMutableLiveData;
     }

@@ -9,6 +9,9 @@ import fr.selquicode.mareu.data.DI.DI;
 import fr.selquicode.mareu.data.repository.MeetingRepository;
 import fr.selquicode.mareu.ui.viewModel.MeetingsViewModel;
 
+/**
+ * class who will create a new ViewModel for a new activity/fragment
+ */
 public class ViewModelFactory implements ViewModelProvider.Factory {
 
     private static volatile ViewModelFactory factory;
@@ -35,7 +38,7 @@ public class ViewModelFactory implements ViewModelProvider.Factory {
     /**
      * Constructor
      */
-    private ViewModelFactory( @NonNull MeetingRepository meetingRepository){
+    private ViewModelFactory(@NonNull MeetingRepository meetingRepository){
         this.meetingRepository = meetingRepository;
     }
 
@@ -48,7 +51,7 @@ public class ViewModelFactory implements ViewModelProvider.Factory {
     @NonNull
     @Override
     public <T extends ViewModel> T create(Class<T> modelClass){
-        // if modelClass - model of classes ViewModel - is the same as new ViewModel created
+        // if modelClass - model of classes ViewModel - is the same as new ViewModel created = MeetingsViewModel
         if(modelClass.isAssignableFrom(MeetingsViewModel.class)){
             return (T) new MeetingsViewModel(meetingRepository);
         }

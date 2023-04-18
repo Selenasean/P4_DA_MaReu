@@ -7,6 +7,9 @@ import java.util.List;
 import fr.selquicode.mareu.data.API.ApiService;
 import fr.selquicode.mareu.data.model.Meeting;
 
+/**
+ * Data source for meetings
+ */
 public class MeetingRepository {
 
     private ApiService mApiService;
