@@ -1,5 +1,6 @@
 package fr.selquicode.mareu.ui.viewModel;
 
+import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 
 import java.util.Objects;
@@ -68,6 +69,7 @@ public class MeetingsViewState {
         return meetingMembers;
     }
 
+    @DrawableRes
     public int getColorRoom() {
         return colorRoom;
     }

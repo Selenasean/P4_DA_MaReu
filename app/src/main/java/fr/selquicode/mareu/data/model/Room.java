@@ -28,6 +28,7 @@ public enum Room {
         this.color = color;
     }
 
+    @DrawableRes
     public int getRoomColor(){
         return color;
     }

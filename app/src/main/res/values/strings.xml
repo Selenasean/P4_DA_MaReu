@@ -2,5 +2,5 @@
     <string name="app_name">MaReu</string>
 
     <string name="content_description_itemImg">colors circle matching the room of the meeting</string>
-    <string name="delete_img">trash image to delete meeting</string>
+    <string name="delete_img">delete meeting</string>
 </resources>

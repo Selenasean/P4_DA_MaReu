@@ -48,8 +48,8 @@ public class MeetingAdapter extends ListAdapter<MeetingsViewState, MeetingAdapte
             date.setText(item.getDate());
             subject.setText(item.getSubject());
             room.setText(item.getRoomName());
-            roomImgText.setText(item.getRoomName().charAt(0));
-            circleColorRoom.setBackgroundColor(item.getColorRoom());
+            roomImgText.setText(item.getRoomName().charAt(0)+ "");
+            circleColorRoom.setImageResource(item.getColorRoom());
             hour.setText(item.getHour());
             members.setText(item.getMeetingMembers());
             //delete.setOnClickListener

@@ -24,5 +24,6 @@
         android:backgroundTint="@color/red"
         app:srcCompat="@drawable/ic_add_white"
         app:tint="@null"
+
        />
 </androidx.constraintlayout.widget.ConstraintLayout>
