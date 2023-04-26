@@ -3,4 +3,10 @@
 
     <string name="content_description_itemImg">colors circle matching the room of the meeting</string>
     <string name="delete_img">delete meeting</string>
+    <string name="between">-</string>
+    <string name="descriptionFab">add new meeting</string>
+
+    <string name="create_meeting_title">Créez votre réunion ! </string>
+    <string name="magic">🪄</string>
+    <string name="hint_room">Choisissez la salle</string>
 </resources>

@@ -1,13 +1,12 @@
-package fr.selquicode.mareu.ui.viewModel.injection;
+package fr.selquicode.mareu.ui.injection;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
-import fr.selquicode.mareu.data.API.ApiService;
-import fr.selquicode.mareu.data.DI.DI;
+
 import fr.selquicode.mareu.data.repository.MeetingRepository;
-import fr.selquicode.mareu.ui.viewModel.MeetingsViewModel;
+import fr.selquicode.mareu.ui.list.MeetingsViewModel;
 
 /**
  * class who will create a new ViewModel for a new activity/fragment
@@ -24,8 +23,8 @@ public class ViewModelFactory implements ViewModelProvider.Factory {
         if(factory == null){
             synchronized (ViewModelFactory.class){
                 if(factory == null){
-                    ApiService apiService = DI.getApiService();
-                    factory = new ViewModelFactory(new MeetingRepository(apiService));
+                    factory = new ViewModelFactory(new MeetingRepository(
+                    ));
                 }
             }
         }

@@ -1,9 +1,10 @@
-package fr.selquicode.mareu.ui.viewModel;
+package fr.selquicode.mareu.ui.list;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,25 +18,31 @@ public class MeetingsViewModel extends ViewModel {
 
     public MeetingsViewModel(MeetingRepository repository) {
         mRepository = repository;
-        List<Meeting> listMeetings = mRepository.getMeetings();
+        List<Meeting> listMeetings = mRepository.getMeetingsMutableLiveData().getValue();
         List<MeetingsViewState> listMeetingsViewState = transformViewState(listMeetings);
         mListMutableLiveData.setValue(listMeetingsViewState);
     }
 
+    /**
+     * Method that transform a list into a ViewState list -which is the UI model-
+     * @param listMeetings - list from {@Link MeetingRepository}
+     * @return meetingsViewState list for the UI
+     */
     private List<MeetingsViewState> transformViewState(List<Meeting> listMeetings) {
-        List<MeetingsViewState> meetingsViewStates = new ArrayList<>();
+        List<MeetingsViewState> meetingsViewState = new ArrayList<>();
 
         for(Meeting meeting : listMeetings){
-            meetingsViewStates.add(new MeetingsViewState(meeting.getId(),
-                    meeting.getDate().toString(),
-                    meeting.getHour().toString(),
-                    meeting.getPlace().getRoomName(),
+
+            meetingsViewState.add(new MeetingsViewState(meeting.getId(),
+                    meeting.getDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
+                    meeting.getHour().format(DateTimeFormatter.ofPattern("HH:mm")),
+                    meeting.getRoom().getRoomName(),
                     meeting.getSubject(),
                     meeting.getMember().toString(),
-                    meeting.getPlace().getRoomColor()
+                    meeting.getRoom().getRoomColor()
                     ));
         }
-        return meetingsViewStates;
+        return meetingsViewState;
     }
 
 
@@ -45,5 +52,12 @@ public class MeetingsViewModel extends ViewModel {
      */
     public LiveData<List<MeetingsViewState>> getMeetings(){
         return mListMutableLiveData;
+    }
+
+    /**
+     * Logic method for delete a meeting
+     */
+    public void onDeleteMeetingClicked(long meetingId){
+        mRepository.deleteMeeting(meetingId);
     }
 }

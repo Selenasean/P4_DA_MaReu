@@ -16,7 +16,8 @@
         tools:listitem="@layout/meeting_item" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-       android:layout_width="wrap_content"
+       android:id="@+id/fab_to_create"
+        android:layout_width="wrap_content"
        android:layout_height="wrap_content"
        app:layout_constraintBottom_toBottomOf="parent"
        app:layout_constraintEnd_toEndOf="parent"
@@ -24,6 +25,5 @@
         android:backgroundTint="@color/red"
         app:srcCompat="@drawable/ic_add_white"
         app:tint="@null"
-
-       />
+        android:contentDescription="@string/descriptionFab" />
 </androidx.constraintlayout.widget.ConstraintLayout>

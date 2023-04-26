@@ -7,16 +7,16 @@ import fr.selquicode.mareu.R;
 
 public enum Room {
 
-    ROOM1("Ananas",R.drawable.room_ananas),
-    ROOM2("Banane", R.drawable.room_banane),
-    ROOM3("Clementine", R.drawable.room_clementine),
-    ROOM4("Durian", R.drawable.room_durian),
-    ROOM5("Endive", R.drawable.room_endive),
-    ROOM6("Figue", R.drawable.room_figue),
-    ROOM7("Gingembre", R.drawable.room_gingembre),
-    ROOM8("Haricot", R.drawable.room_haricot),
-    ROOM9("Igname", R.drawable.room_igname),
-    ROOM10("Jujube", R.drawable.room_jujube);
+    ROOM1("Salle A",R.drawable.room_ananas),
+    ROOM2("Salle B", R.drawable.room_banane),
+    ROOM3("Salle C", R.drawable.room_clementine),
+    ROOM4("Salle D", R.drawable.room_durian),
+    ROOM5("Salle E", R.drawable.room_endive),
+    ROOM6("Salle F", R.drawable.room_figue),
+    ROOM7("Salle G", R.drawable.room_gingembre),
+    ROOM8("Salle H", R.drawable.room_haricot),
+    ROOM9("Salle I", R.drawable.room_igname),
+    ROOM10("Salle J", R.drawable.room_jujube);
 
     private final String name;
 

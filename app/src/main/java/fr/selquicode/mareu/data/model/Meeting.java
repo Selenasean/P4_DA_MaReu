@@ -21,7 +21,7 @@ public class Meeting {
     private LocalTime hour;
 
     /** place of meeting */
-    private Room place;
+    private Room room;
 
     /** subject */
     private String subject;
@@ -35,15 +35,15 @@ public class Meeting {
      *
      * @param date
      * @param hour
-     * @param place
+     * @param room
      * @param subject
      * @param member
      */
-    public Meeting(long id, LocalDate date,LocalTime hour, Room place, String subject, List<String> member ){
+    public Meeting(long id, LocalDate date,LocalTime hour, Room room, String subject, List<String> member ){
         this.id = id;
         this.date = date;
         this.hour = hour;
-        this.place = place;
+        this.room = room;
         this.subject = subject;
         this.member = member;
     }
@@ -72,12 +72,12 @@ public class Meeting {
         this.hour = hour;
     }
 
-    public Room getPlace() {
-        return place;
+    public Room getRoom() {
+        return room;
     }
 
-    public void setPlace(Room place) {
-        this.place = place;
+    public void setRoom(Room room) {
+        this.room = room;
     }
 
     public String getSubject() {
@@ -108,5 +108,17 @@ public class Meeting {
     @Override
     public int hashCode() {
         return Objects.hash(getId());
+    }
+
+    @Override
+    public String toString() {
+        return "Meeting{" +
+                "id=" + id +
+                ", date=" + date +
+                ", hour=" + hour +
+                ", room=" + room +
+                ", subject='" + subject + '\'' +
+                ", member=" + member +
+                '}';
     }
 }

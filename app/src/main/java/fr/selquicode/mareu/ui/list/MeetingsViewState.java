@@ -1,4 +1,4 @@
-package fr.selquicode.mareu.ui.viewModel;
+package fr.selquicode.mareu.ui.list;
 
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;

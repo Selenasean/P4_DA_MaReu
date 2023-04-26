@@ -1,4 +1,4 @@
-package fr.selquicode.mareu.ui;
+package fr.selquicode.mareu.ui.list;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -10,23 +10,20 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
 
 import java.util.List;
 
 import fr.selquicode.mareu.R;
-import fr.selquicode.mareu.data.model.Meeting;
 import fr.selquicode.mareu.databinding.ActivityMeetingsBinding;
-import fr.selquicode.mareu.ui.viewModel.MeetingsViewModel;
-import fr.selquicode.mareu.ui.viewModel.MeetingsViewState;
-import fr.selquicode.mareu.ui.viewModel.injection.ViewModelFactory;
+import fr.selquicode.mareu.ui.create.CreateMeetingActivity;
+import fr.selquicode.mareu.ui.injection.ViewModelFactory;
 
-public class MeetingsActivity extends AppCompatActivity {
+public class MeetingsActivity extends AppCompatActivity implements OnMeetingClickedListener{
 
     private ActivityMeetingsBinding binding;
     private MeetingsViewModel meetingsViewModel;
-    MeetingAdapter mListAdapter = new MeetingAdapter();
+
+    MeetingAdapter mListAdapter = new MeetingAdapter(this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,26 +32,29 @@ public class MeetingsActivity extends AppCompatActivity {
         binding = ActivityMeetingsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-
         setViewModel();
         setRecycleView();
+        initFab();
 
+    }
+
+    private void initFab() {
+        binding.fabToCreate.setOnClickListener(view -> startActivity(CreateMeetingActivity.navigate(MeetingsActivity.this)));
     }
 
     private void setViewModel() {
         meetingsViewModel = new ViewModelProvider(this, ViewModelFactory.getInstance()).get(MeetingsViewModel.class);
 
-        final Observer<List<MeetingsViewState>> nameObserver = new Observer<List<MeetingsViewState>>() {
+        final Observer<List<MeetingsViewState>> listObserver = new Observer<List<MeetingsViewState>>() {
             @Override
             public void onChanged(@Nullable final List<MeetingsViewState> listMeetingVS) {
                 mListAdapter.submitList(listMeetingVS);
             }
         };
-        meetingsViewModel.getMeetings().observe(this, nameObserver);
+        meetingsViewModel.getMeetings().observe(this, listObserver);
     }
 
     private void setRecycleView(){
-
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(this, DividerItemDecoration.VERTICAL);
         RecyclerView mRecycleView = binding.listMeetings;
         mRecycleView.addItemDecoration(dividerItemDecoration);
@@ -63,4 +63,8 @@ public class MeetingsActivity extends AppCompatActivity {
         mRecycleView.setAdapter(mListAdapter);
     }
 
+    @Override
+    public void onDeleteMeetingClicked(long meetingId) {
+        meetingsViewModel.onDeleteMeetingClicked(meetingId);
+    }
 }
