@@ -28,7 +28,6 @@ public class MeetingsActivity extends AppCompatActivity implements OnMeetingClic
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_meetings);
         binding = ActivityMeetingsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 

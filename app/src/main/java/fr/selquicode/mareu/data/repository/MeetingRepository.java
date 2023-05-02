@@ -1,7 +1,5 @@
 package fr.selquicode.mareu.data.repository;
 
-import android.util.Log;
-
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
@@ -19,37 +17,35 @@ import fr.selquicode.mareu.data.model.Room;
  */
 public class MeetingRepository {
 
-    private final MutableLiveData<List<Meeting>> meetingsMutableLiveData = new MutableLiveData<>();
+    private final MutableLiveData<List<Meeting>> meetingsMutableLiveData = new MutableLiveData<>(SuperMeetingGenerator.SUPER_MEETINGS);
 
 
-    public MutableLiveData<List<Meeting>> getMeetingsMutableLiveData() {
-        meetingsMutableLiveData.setValue(SuperMeetingGenerator.SUPER_MEETINGS);
+    public LiveData<List<Meeting>> getMeetingsLiveData() {
         return meetingsMutableLiveData;
     }
 
     /**
      * To delete a meeting from the list
+     *
      * @param id of the meeting selected
      */
     public void deleteMeeting(long id) {
         List<Meeting> meetingsList = meetingsMutableLiveData.getValue();
-        if(meetingsList == null){
-            Log.i("REPOSITORY", "meetingsMuutableLiveData ne contient rien");
-        }else{
-            Log.i("REPOSITORY","mutableLivData contient qlqch");
-            for(Meeting meeting : meetingsList){
-                if(meeting.getId() == id){
-                    meetingsList.remove(meeting) ;
-                    break;
-                }
+        if (meetingsList == null) {
+            return;
+        }
+        for (Meeting meeting : meetingsList) {
+            if (meeting.getId() == id) {
+                meetingsList.remove(meeting);
+                break;
             }
         }
         meetingsMutableLiveData.setValue(meetingsList);
-        Log.i("REPOSITORY", String.valueOf(meetingsMutableLiveData.getValue()));
     }
 
     /**
      * To create a new meeting
+     *
      * @param meeting
      */
     public void createMeeting(Meeting meeting) {
@@ -60,6 +56,7 @@ public class MeetingRepository {
 
     /**
      * To filtrate the meeting's list by date
+     *
      * @param date
      * @return
      */
@@ -67,8 +64,8 @@ public class MeetingRepository {
         List<Meeting> meetingsList = meetingsMutableLiveData.getValue();
         MutableLiveData<List<Meeting>> list = new MutableLiveData<>(new ArrayList<>());
 
-        for(Meeting meeting : meetingsList){
-            if(date.equals(meeting.getDate())){
+        for (Meeting meeting : meetingsList) {
+            if (date.equals(meeting.getDate())) {
                 list.setValue(Arrays.asList(meeting));
             }
         }
@@ -77,6 +74,7 @@ public class MeetingRepository {
 
     /**
      * To filtrate the meeting's list by room
+     *
      * @param room
      * @return
      */
@@ -84,8 +82,8 @@ public class MeetingRepository {
         List<Meeting> meetingsList = meetingsMutableLiveData.getValue();
         MutableLiveData<List<Meeting>> list = new MutableLiveData<>(new ArrayList<>());
 
-        for(Meeting meeting : meetingsList){
-            if(room.equals(meeting.getRoom())) list.setValue(Arrays.asList(meeting));
+        for (Meeting meeting : meetingsList) {
+            if (room.equals(meeting.getRoom())) list.setValue(Arrays.asList(meeting));
         }
         return list;
     }

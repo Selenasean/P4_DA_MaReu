@@ -7,6 +7,16 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <!-- Custom color for custom theme -->
+    <color name="blue">#3185D9</color>
+    <color name="blue_dark">#1b4595</color>
+    <color name="blue_light">#93C9FF</color>
+    <color name="yellow">#d98531</color>
+    <color name="yellow_dar">#ce4f08</color>
+    <color name="yellow_light">#efaf4e</color>
+
+    <!-- Color rooms -->
     <color name="yellowBanane">#fcf794</color>
     <color name="orangeAnanas">#fccd94</color>
     <color name="orangeClementine">#ffbb8e</color>

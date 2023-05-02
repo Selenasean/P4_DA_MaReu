@@ -52,9 +52,8 @@ public class MeetingAdapter extends ListAdapter<MeetingsViewState, MeetingAdapte
             room.setText(item.getRoomName());
             roomImgText.setText(item.getRoomName().charAt(6) + "");
             circleColorRoom.setImageResource(item.getColorRoom());
-            hour.setText(item.getHour().replaceAll(":", "h"));
-            String str = item.getMeetingMembers().replaceAll("[\\[\\]]", "");
-            members.setText(str);
+            hour.setText(item.getHour());
+            members.setText(item.getMeetingMembers());
 
             deleteImg.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -76,8 +75,6 @@ public class MeetingAdapter extends ListAdapter<MeetingsViewState, MeetingAdapte
     @Override
     public void onBindViewHolder(@NonNull MeetingAdapter.ViewHolder holder, int position) {
         holder.bind(getItem(position), listener);
-
-
     }
 
     /**

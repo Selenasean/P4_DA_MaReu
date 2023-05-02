@@ -9,4 +9,11 @@
     <string name="create_meeting_title">Créez votre réunion ! </string>
     <string name="magic">🪄</string>
     <string name="hint_room">Choisissez la salle</string>
+    <string name="choose">Choisissez : </string>
+    <string name="hint_date">La date</string>
+    <string name="hint_time">L\'heure</string>
+    <string name="time_picker_text">Chosissez l\'heure de la réunion</string>
+    <string name="hint_subject">Le sujet de la réunion</string>
+    <string name="hint_participants">Les participants (min. 3 personnes)</string>
+    <string name="creation">Création ✨</string>
 </resources>

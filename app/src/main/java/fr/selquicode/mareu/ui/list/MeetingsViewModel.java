@@ -1,7 +1,7 @@
 package fr.selquicode.mareu.ui.list;
 
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModel;
 
 import java.time.format.DateTimeFormatter;
@@ -14,18 +14,19 @@ import fr.selquicode.mareu.data.repository.MeetingRepository;
 public class MeetingsViewModel extends ViewModel {
 
     private MeetingRepository mRepository;
-    private MutableLiveData<List<MeetingsViewState>> mListMutableLiveData = new MutableLiveData<>();
+    private LiveData<List<MeetingsViewState>> mListLiveData;
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    private final DateTimeFormatter formatterHour = DateTimeFormatter.ofPattern("HH'h'mm");
 
     public MeetingsViewModel(MeetingRepository repository) {
         mRepository = repository;
-        List<Meeting> listMeetings = mRepository.getMeetingsMutableLiveData().getValue();
-        List<MeetingsViewState> listMeetingsViewState = transformViewState(listMeetings);
-        mListMutableLiveData.setValue(listMeetingsViewState);
+        LiveData<List<Meeting>> listMeetings = mRepository.getMeetingsLiveData();
+        mListLiveData = Transformations.map(listMeetings, this::transformViewState);
     }
 
     /**
      * Method that transform a list into a ViewState list -which is the UI model-
-     * @param listMeetings - list from {@Link MeetingRepository}
+     * @param listMeetings - list from { @Link  MeetingRepository }
      * @return meetingsViewState list for the UI
      */
     private List<MeetingsViewState> transformViewState(List<Meeting> listMeetings) {
@@ -34,11 +35,11 @@ public class MeetingsViewModel extends ViewModel {
         for(Meeting meeting : listMeetings){
 
             meetingsViewState.add(new MeetingsViewState(meeting.getId(),
-                    meeting.getDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
-                    meeting.getHour().format(DateTimeFormatter.ofPattern("HH:mm")),
+                    meeting.getDate().format(formatter),
+                    meeting.getHour().format(formatterHour),
                     meeting.getRoom().getRoomName(),
                     meeting.getSubject(),
-                    meeting.getMember().toString(),
+                    String.join(", ", meeting.getMembers()),
                     meeting.getRoom().getRoomColor()
                     ));
         }
@@ -51,7 +52,7 @@ public class MeetingsViewModel extends ViewModel {
      * @return List of meetings type LiveData
      */
     public LiveData<List<MeetingsViewState>> getMeetings(){
-        return mListMutableLiveData;
+        return mListLiveData;
     }
 
     /**

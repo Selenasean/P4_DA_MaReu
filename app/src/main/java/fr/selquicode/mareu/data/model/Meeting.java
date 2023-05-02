@@ -27,7 +27,7 @@ public class Meeting {
     private String subject;
 
     /** participants  */
-    private List<String> member;
+    private List<String> members;
 
 
     /**
@@ -37,15 +37,15 @@ public class Meeting {
      * @param hour
      * @param room
      * @param subject
-     * @param member
+     * @param members
      */
-    public Meeting(long id, LocalDate date,LocalTime hour, Room room, String subject, List<String> member ){
+    public Meeting(long id, LocalDate date,LocalTime hour, Room room, String subject, List<String> members){
         this.id = id;
         this.date = date;
         this.hour = hour;
         this.room = room;
         this.subject = subject;
-        this.member = member;
+        this.members = members;
     }
 
     public long getId() {
@@ -88,12 +88,12 @@ public class Meeting {
         this.subject = subject;
     }
 
-    public List<String> getMember() {
-        return member;
+    public List<String> getMembers() {
+        return members;
     }
 
-    public void setMember(List<String> member) {
-        this.member = member;
+    public void setMembers(List<String> members) {
+        this.members = members;
     }
 
 
@@ -118,7 +118,7 @@ public class Meeting {
                 ", hour=" + hour +
                 ", room=" + room +
                 ", subject='" + subject + '\'' +
-                ", member=" + member +
+                ", member=" + members +
                 '}';
     }
 }

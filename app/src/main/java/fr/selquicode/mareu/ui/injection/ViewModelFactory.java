@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 
 import fr.selquicode.mareu.data.repository.MeetingRepository;
+import fr.selquicode.mareu.ui.create.CreateMeetingViewModel;
 import fr.selquicode.mareu.ui.list.MeetingsViewModel;
 
 /**
@@ -23,8 +24,7 @@ public class ViewModelFactory implements ViewModelProvider.Factory {
         if(factory == null){
             synchronized (ViewModelFactory.class){
                 if(factory == null){
-                    factory = new ViewModelFactory(new MeetingRepository(
-                    ));
+                    factory = new ViewModelFactory(new MeetingRepository());
                 }
             }
         }
@@ -53,6 +53,9 @@ public class ViewModelFactory implements ViewModelProvider.Factory {
         // if modelClass - model of classes ViewModel - is the same as new ViewModel created = MeetingsViewModel
         if(modelClass.isAssignableFrom(MeetingsViewModel.class)){
             return (T) new MeetingsViewModel(meetingRepository);
+        }
+        else if(modelClass.isAssignableFrom(CreateMeetingViewModel.class)){
+            return (T) new  CreateMeetingViewModel(meetingRepository);
         }
         throw new IllegalArgumentException("Unknown ViewModel class");
     }
