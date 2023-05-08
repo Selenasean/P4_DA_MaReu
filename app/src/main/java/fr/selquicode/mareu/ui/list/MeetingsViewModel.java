@@ -46,7 +46,6 @@ public class MeetingsViewModel extends ViewModel {
         return meetingsViewState;
     }
 
-
     /**
      * Get all meetings
      * @return List of meetings type LiveData

@@ -55,7 +55,7 @@
             android:textColorHint="@color/black">
 
             <AutoCompleteTextView
-                android:id="@+id/autoCompleteTextV"
+                android:id="@+id/choose_roomTextV"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:inputType="none"

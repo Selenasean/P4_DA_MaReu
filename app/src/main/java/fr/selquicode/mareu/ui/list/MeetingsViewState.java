@@ -6,8 +6,8 @@ import androidx.annotation.NonNull;
 import java.util.Objects;
 
 /**
- * This is the model of the view that the data have to follow
- * A ViewState contains data model use for displaying the View
+ * This is the model of the view that the data have to fit into
+ * ViewState contains data model use for displaying the View
  */
 public class MeetingsViewState {
 
@@ -30,7 +30,13 @@ public class MeetingsViewState {
      * @param subject
      * @param meetingMembers
      */
-    public MeetingsViewState(long id, @NonNull String date, @NonNull String hour, @NonNull String roomName,@NonNull String subject, @NonNull String meetingMembers, @NonNull int colorRoom) {
+    public MeetingsViewState(long id,
+                             @NonNull String date,
+                             @NonNull String hour,
+                             @NonNull String roomName,
+                             @NonNull String subject,
+                             @NonNull String meetingMembers,
+                             @NonNull int colorRoom) {
         this.id = id;
         this.date = date;
         this.hour = hour;

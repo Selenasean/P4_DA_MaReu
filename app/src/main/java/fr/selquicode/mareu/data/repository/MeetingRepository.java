@@ -18,7 +18,7 @@ import fr.selquicode.mareu.data.model.Room;
 public class MeetingRepository {
 
     private final MutableLiveData<List<Meeting>> meetingsMutableLiveData = new MutableLiveData<>(SuperMeetingGenerator.SUPER_MEETINGS);
-
+    long id = 4;
 
     public LiveData<List<Meeting>> getMeetingsLiveData() {
         return meetingsMutableLiveData;
@@ -50,8 +50,17 @@ public class MeetingRepository {
      */
     public void createMeeting(Meeting meeting) {
         List<Meeting> meetingsList = meetingsMutableLiveData.getValue();
+        assert meetingsList != null;
         meetingsList.add(meeting);
         meetingsMutableLiveData.setValue(meetingsList);
+    }
+
+    /**
+     * To generate an id for a created meeting
+     */
+    public long generateId(){
+        id++;
+        return id;
     }
 
     /**

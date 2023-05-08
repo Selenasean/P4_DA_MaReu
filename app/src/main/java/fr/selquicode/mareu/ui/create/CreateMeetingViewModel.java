@@ -4,25 +4,41 @@ import android.content.Context;
 import android.util.Patterns;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModel;
 
-import java.text.DateFormat;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Random;
+import java.util.List;
+import java.util.Locale;
 
+import fr.selquicode.mareu.data.model.Meeting;
 import fr.selquicode.mareu.data.model.Room;
 import fr.selquicode.mareu.data.repository.MeetingRepository;
 
 public class CreateMeetingViewModel extends ViewModel {
 
     private MeetingRepository mRepository;
+    private LiveData<CreateMeetingViewState> createdMeetingLV;
     private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     private final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH'h'mm");
 
     public CreateMeetingViewModel(MeetingRepository repository){
         mRepository = repository;
+    }
+
+    /**
+     * Generate a id
+     */
+    public long generateId(){ return mRepository.generateId(); }
+
+    /**
+     * Method to add a meeting in dataBase
+     */
+    public void createMeeting(Meeting meeting){
+        mRepository.createMeeting(meeting);
     }
 
     /**
@@ -64,6 +80,9 @@ public class CreateMeetingViewModel extends ViewModel {
         LocalDate localDate = LocalDate.parse(date, dateFormatter);
         return localDate;
     }
+    public String formatDate(int dayOfMonth, int month, int year) {
+        return String.format(Locale.FRANCE, "%02d/%02d/%04d", dayOfMonth, month, year);
+    }
 
     /**
      * Parse string hour into LocalTime format
@@ -72,16 +91,26 @@ public class CreateMeetingViewModel extends ViewModel {
      */
     public LocalTime parseToLocalTime(String hour){
         LocalTime localTime = LocalTime.parse(hour, timeFormatter);
-        return null;
+        return localTime;
     }
+
     /**
-     * method to generate id
+     * Check if all the inputs are filled
      */
-    public long idGenerator(){
-        Random random = new Random(4);
-        return random.nextLong();
+    public boolean isMeetingInfoComplete(@NonNull String roomName,
+                                         @NonNull String date,
+                                         @NonNull String hour,
+                                         @NonNull String subject,
+                                         @NonNull List<String> members){
+        if(roomName.isEmpty()
+                || date.isEmpty()
+                || hour.isEmpty()
+                || subject.isEmpty()
+                || members.size() == 0) {
+            return false;
+        }else{
+            return true;
+        }
     }
-
-
 
 }

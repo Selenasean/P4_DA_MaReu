@@ -7,8 +7,6 @@ import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.View;
 import android.widget.ArrayAdapter;
 
@@ -20,15 +18,17 @@ import androidx.lifecycle.ViewModelProvider;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.textfield.TextInputEditText;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
 import fr.selquicode.mareu.R;
+import fr.selquicode.mareu.data.model.Meeting;
 import fr.selquicode.mareu.data.model.Room;
 import fr.selquicode.mareu.databinding.ActivityCreateBinding;
 import fr.selquicode.mareu.ui.injection.ViewModelFactory;
@@ -37,6 +37,12 @@ public class CreateMeetingActivity extends AppCompatActivity {
 
     private ActivityCreateBinding binding;
     private CreateMeetingViewModel createMeetingViewModel;
+    public ZoneId z = ZoneId.of("Europe/Paris");
+    public ZonedDateTime zdt = ZonedDateTime.now(z);
+    @NonNull
+    private String selectedRoom = "";
+    @NonNull
+    private List<String> emailsParticipants = new ArrayList<>();
 
     @NonNull
     public static Intent navigate(Context context) {
@@ -59,9 +65,27 @@ public class CreateMeetingActivity extends AppCompatActivity {
 
         // settings for room selection
         configureRoomChoice();
+        getRoomSelected();
 
         // settings for participants' list
         displayParticipantEmail();
+
+        //create meeting button
+        binding.btnCreate.setEnabled(false);
+        binding.btnCreate.setOnClickListener(v -> createTheMeeting());
+    }
+
+
+    private void checkInfoCompleted() {
+        if (createMeetingViewModel.isMeetingInfoComplete(selectedRoom,
+                binding.datepicker.getText().toString(),
+                binding.timepicker.getText().toString(),
+                binding.subject.getText().toString(),
+                emailsParticipants)) {
+            binding.btnCreate.setEnabled(true);
+        } else {
+            binding.btnCreate.setEnabled(false);
+        }
     }
 
     /**
@@ -70,14 +94,15 @@ public class CreateMeetingActivity extends AppCompatActivity {
     private void displayParticipantEmail() {
         TextInputEditText emailInput = binding.participantsTextInput;
         binding.addEmailParticipant.setOnClickListener(v -> {
-            if(!emailInput.toString().isEmpty() && createMeetingViewModel.isEmailValid(emailInput.getEditableText().toString(), this)){
+            if (!emailInput.toString().isEmpty() && createMeetingViewModel.isEmailValid(emailInput.getEditableText().toString(), this)) {
                 configureParticipantChip(binding.participantsTextInput);
                 emailInput.setText("");
             }
-       });
+        });
     }
+
     private void configureParticipantChip(@NonNull TextInputEditText participantsTextInput) {
-        Chip chip =  new Chip(this);
+        Chip chip = new Chip(this);
         chip.setText(Objects.requireNonNull(participantsTextInput.getText()).toString());
         chip.setChipIconResource(R.drawable.ic_person_black);
         chip.setCloseIconVisible(true);
@@ -85,51 +110,57 @@ public class CreateMeetingActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 binding.chipGroup.removeView(chip);
+                emailsParticipants.remove(chip.getText().toString());
+                checkInfoCompleted();
             }
         });
         binding.chipGroup.addView(chip);
+        emailsParticipants.add(chip.getText().toString());
+        checkInfoCompleted();
     }
 
     /**
      * Method to init the date picker
      */
     private void configureDatePicker() {
-        Locale.setDefault(Locale.FRANCE);
-        final Calendar c = Calendar.getInstance();
-
-        // get current date, using Calendar's instance
-        int mYear = c.get(Calendar.YEAR);
-        int mMonth = c.get(Calendar.MONTH);
-        int mDay = c.get(Calendar.DAY_OF_MONTH);
+        int mDay = zdt.getDayOfMonth();
+        int mMonth = zdt.getMonthValue();
+        int mYear = zdt.getYear();
 
         // set date picker dialog
         int style = AlertDialog.THEME_HOLO_LIGHT;
-        DatePickerDialog datePickerDialog = new DatePickerDialog(this, style,(view, year, month, dayOfMonth) ->
-                binding.datepicker.setText(dayOfMonth + "/" + (month + 1) + "/" + year), mYear, mMonth, mDay);
-        datePickerDialog.getDatePicker().setFirstDayOfWeek(Calendar.MONDAY);
-        datePickerDialog.getDatePicker().setMinDate(c.getTimeInMillis());
+        DatePickerDialog datePickerDialog = new DatePickerDialog(this,
+                style,
+                (view, year, month, dayOfMonth) -> {
+                    String date = createMeetingViewModel.formatDate(dayOfMonth, (month + 1), year);
+                    binding.datepicker.setText(date);
+                },
+                mYear,
+                (mMonth - 1),
+                mDay);
+        datePickerDialog.getDatePicker().setMinDate(zdt.toInstant().getEpochSecond());
         datePickerDialog.show();
+        checkInfoCompleted();
     }
 
     /**
-     * Method to init the date picker
+     * Method to init the time picker
      */
     private void configureTimePicker() {
-        //get current hour from France
-        ZoneId z = ZoneId.of("Europe/Paris");
-        ZonedDateTime zdt = ZonedDateTime.now(z);
         int hour = zdt.getHour();
         int minute = zdt.getMinute();
 
+        //set time picker dialog
         TimePickerDialog.OnTimeSetListener timePickerListener = (timePicker, selectedHour, selectedMinute) -> {
             binding.timepicker.setText(String.format(Locale.getDefault(), "%02d:%02d", selectedHour, selectedMinute));
 
         };
-
         int style = AlertDialog.THEME_HOLO_LIGHT;
         TimePickerDialog timePickerDialog = new TimePickerDialog(this, style, timePickerListener, hour, minute, true);
         timePickerDialog.setTitle(R.string.time_picker_text);
         timePickerDialog.show();
+
+        checkInfoCompleted();
     }
 
     /**
@@ -143,6 +174,27 @@ public class CreateMeetingActivity extends AppCompatActivity {
         }
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.room_list_item, roomList);
-        binding.autoCompleteTextV.setAdapter(adapter);
+        binding.chooseRoomTextV.setAdapter(adapter);
+        checkInfoCompleted();
+    }
+
+    private void getRoomSelected() {
+        binding.chooseRoomTextV.setOnItemClickListener((adapterView, v, position, id) ->
+                selectedRoom = adapterView.getItemAtPosition(position).toString());
+    }
+
+    private void createTheMeeting() {
+        long idMeetingCreated = createMeetingViewModel.generateId();
+        LocalDate dateMeetingCreated = createMeetingViewModel.parseToLocalDate(binding.datepicker.getText().toString());
+        LocalTime hourMeetingCreated = createMeetingViewModel.parseToLocalTime(binding.timepicker.getText().toString());
+        Room roomMeetingCreated = createMeetingViewModel.parseToRoom(selectedRoom);
+        String subjectMeetingCreated = binding.subject.getText().toString();
+
+        createMeetingViewModel.createMeeting(new Meeting(idMeetingCreated,
+                dateMeetingCreated,
+                hourMeetingCreated,
+                roomMeetingCreated,
+                subjectMeetingCreated,
+                emailsParticipants));
     }
 }
