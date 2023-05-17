@@ -1,24 +1,33 @@
 package fr.selquicode.mareu.ui.list;
 
-import androidx.annotation.Nullable;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.DatePickerDialog;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.Calendar;
 import java.util.List;
 
 import fr.selquicode.mareu.R;
 import fr.selquicode.mareu.databinding.ActivityMeetingsBinding;
 import fr.selquicode.mareu.ui.create.CreateMeetingActivity;
-import fr.selquicode.mareu.ui.injection.ViewModelFactory;
+import fr.selquicode.mareu.ui.utils.injection.ViewModelFactory;
+import fr.selquicode.mareu.ui.list.filter_room.OnSelectedRoomListener;
+import fr.selquicode.mareu.ui.list.filter_room.RoomDialogFragment;
 
-public class MeetingsActivity extends AppCompatActivity implements OnMeetingClickedListener{
+public class MeetingsActivity extends AppCompatActivity implements OnMeetingClickedListener, OnSelectedRoomListener {
 
     private ActivityMeetingsBinding binding;
     private MeetingsViewModel meetingsViewModel;
@@ -34,22 +43,19 @@ public class MeetingsActivity extends AppCompatActivity implements OnMeetingClic
         setViewModel();
         setRecycleView();
         initFab();
-
     }
 
     private void initFab() {
         binding.fabToCreate.setOnClickListener(view -> startActivity(CreateMeetingActivity.navigate(MeetingsActivity.this)));
     }
 
+    /**
+     * To set MeetingsViewModel & the Observer on the list
+     */
     private void setViewModel() {
         meetingsViewModel = new ViewModelProvider(this, ViewModelFactory.getInstance()).get(MeetingsViewModel.class);
 
-        final Observer<List<MeetingsViewState>> listObserver = new Observer<List<MeetingsViewState>>() {
-            @Override
-            public void onChanged(@Nullable final List<MeetingsViewState> listMeetingVS) {
-                mListAdapter.submitList(listMeetingVS);
-            }
-        };
+        final Observer<List<MeetingsViewState>> listObserver = listMeetingVS -> mListAdapter.submitList(listMeetingVS);
         meetingsViewModel.getMeetings().observe(this, listObserver);
     }
 
@@ -66,4 +72,88 @@ public class MeetingsActivity extends AppCompatActivity implements OnMeetingClic
     public void onDeleteMeetingClicked(long meetingId) {
         meetingsViewModel.onDeleteMeetingClicked(meetingId);
     }
+
+    /**
+     * Called to linked layout and menu
+     * @param menu  in which you place your items.
+     * @return boolean
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu, menu);
+        return true;
+    }
+
+    /**
+     * Called to know which item user selected,
+     * and execute a method according to it
+     * @param item that was selected.
+     *
+     * @return
+     */
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.filter_date:
+                openDateDialog();
+                return true;
+            case R.id.filter_room:
+                roomDialog();
+                return true;
+            case R.id.filter_return:
+                resetFilter();
+                return true;
+            default :
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    /**
+     * To reset all filters
+     */
+    private void resetFilter() {
+        meetingsViewModel.resetFilters();
+    }
+
+    /**
+     * Open a DialogFragment of Room's list to choose
+     */
+    private void roomDialog() {
+        RoomDialogFragment.newInstance().show(getSupportFragmentManager(), null);
+    }
+
+    /**
+     * Listener from room selected on FragmentDialog
+     * @param room
+     */
+    @Override
+    public void onSelectedRoom(String room) {
+        meetingsViewModel.filterByRoom(room);
+    }
+
+    /**
+     * Open a Date Picker Dialog to choose a date,
+     * then used the date selected to sort list
+     */
+    private void openDateDialog() {
+        ZoneId z = ZoneId.of("Europe/Paris");
+        ZonedDateTime zdt = ZonedDateTime.now(z);
+        int mDay = zdt.getDayOfMonth();
+        int mMonth = zdt.getMonthValue();
+        int mYear = zdt.getYear();
+
+        DatePickerDialog datePickerDialog = new DatePickerDialog(this,
+                (view, year, month, dayOfMonth) -> {
+                    LocalDate date = meetingsViewModel.formatDate(year, (month +1),dayOfMonth);
+                    meetingsViewModel.filterByDate(date);
+                },
+                mYear,
+                (mMonth - 1),
+                mDay);
+        datePickerDialog.getDatePicker().setMinDate(zdt.toInstant().toEpochMilli());
+        datePickerDialog.getDatePicker().setFirstDayOfWeek(Calendar.MONDAY);
+        datePickerDialog.show();
+    }
+
 }

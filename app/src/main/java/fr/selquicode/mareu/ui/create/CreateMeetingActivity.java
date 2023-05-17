@@ -13,6 +13,7 @@ import android.widget.ArrayAdapter;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.chip.Chip;
@@ -31,7 +32,7 @@ import fr.selquicode.mareu.R;
 import fr.selquicode.mareu.data.model.Meeting;
 import fr.selquicode.mareu.data.model.Room;
 import fr.selquicode.mareu.databinding.ActivityCreateBinding;
-import fr.selquicode.mareu.ui.injection.ViewModelFactory;
+import fr.selquicode.mareu.ui.utils.injection.ViewModelFactory;
 
 public class CreateMeetingActivity extends AppCompatActivity {
 
@@ -44,6 +45,11 @@ public class CreateMeetingActivity extends AppCompatActivity {
     @NonNull
     private List<String> emailsParticipants = new ArrayList<>();
 
+    /**
+     * To navigate from mainActivity to here
+     * @param context
+     * @return
+     */
     @NonNull
     public static Intent navigate(Context context) {
         return new Intent(context, CreateMeetingActivity.class);
@@ -55,7 +61,8 @@ public class CreateMeetingActivity extends AppCompatActivity {
         binding = ActivityCreateBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        createMeetingViewModel = new ViewModelProvider(this, ViewModelFactory.getInstance()).get(CreateMeetingViewModel.class);
+        //settings ViewModel & Observer
+        setViewModel();
 
         // settings for Date & Time Pickers
         binding.datepicker.setFocusable(false);
@@ -75,18 +82,24 @@ public class CreateMeetingActivity extends AppCompatActivity {
         binding.btnCreate.setOnClickListener(v -> createTheMeeting());
     }
 
-
-    private void checkInfoCompleted() {
-        if (createMeetingViewModel.isMeetingInfoComplete(selectedRoom,
-                binding.datepicker.getText().toString(),
-                binding.timepicker.getText().toString(),
-                binding.subject.getText().toString(),
-                emailsParticipants)) {
-            binding.btnCreate.setEnabled(true);
-        } else {
-            binding.btnCreate.setEnabled(false);
-        }
+    private void setViewModel() {
+        createMeetingViewModel = new ViewModelProvider(this, ViewModelFactory.getInstance()).get(CreateMeetingViewModel.class);
+        createMeetingViewModel.getCreatedMeetingLiveData().observe(this, new Observer<CreateMeetingViewState>() {
+            @Override
+            public void onChanged(CreateMeetingViewState state) {
+                CreateMeetingActivity.this.render(state);
+            }
+        });
     }
+
+    private void render(CreateMeetingViewState state) {
+        //refresh UI
+        binding.datepicker.setText(state.getDate());
+
+        //enabled create btn
+        binding.btnCreate.setEnabled(state.isCreatedEnabled());
+    }
+
 
     /**
      * Display chips of participants'email regarding the input
@@ -94,8 +107,8 @@ public class CreateMeetingActivity extends AppCompatActivity {
     private void displayParticipantEmail() {
         TextInputEditText emailInput = binding.participantsTextInput;
         binding.addEmailParticipant.setOnClickListener(v -> {
-            if (!emailInput.toString().isEmpty() && createMeetingViewModel.isEmailValid(emailInput.getEditableText().toString(), this)) {
-                configureParticipantChip(binding.participantsTextInput);
+            if(createMeetingViewModel.isEmailValid(emailInput.getEditableText().toString(), this)){
+                configureParticipantChip(emailInput);
                 emailInput.setText("");
             }
         });
@@ -111,12 +124,12 @@ public class CreateMeetingActivity extends AppCompatActivity {
             public void onClick(View v) {
                 binding.chipGroup.removeView(chip);
                 emailsParticipants.remove(chip.getText().toString());
-                checkInfoCompleted();
+                //checkInfoCompleted();
             }
         });
         binding.chipGroup.addView(chip);
         emailsParticipants.add(chip.getText().toString());
-        checkInfoCompleted();
+        //checkInfoCompleted();
     }
 
     /**
@@ -132,15 +145,16 @@ public class CreateMeetingActivity extends AppCompatActivity {
         DatePickerDialog datePickerDialog = new DatePickerDialog(this,
                 style,
                 (view, year, month, dayOfMonth) -> {
-                    String date = createMeetingViewModel.formatDate(dayOfMonth, (month + 1), year);
-                    binding.datepicker.setText(date);
+                    createMeetingViewModel.onDateChanged(dayOfMonth, month, year);
+                    // String date = createMeetingViewModel.formatDate(dayOfMonth, (month + 1), year);
+                    //binding.datepicker.setText(date);
                 },
                 mYear,
                 (mMonth - 1),
                 mDay);
-        datePickerDialog.getDatePicker().setMinDate(zdt.toInstant().getEpochSecond());
+        datePickerDialog.getDatePicker().setMinDate(zdt.toInstant().toEpochMilli());
         datePickerDialog.show();
-        checkInfoCompleted();
+        //checkInfoCompleted();
     }
 
     /**
@@ -160,7 +174,7 @@ public class CreateMeetingActivity extends AppCompatActivity {
         timePickerDialog.setTitle(R.string.time_picker_text);
         timePickerDialog.show();
 
-        checkInfoCompleted();
+        //checkInfoCompleted();
     }
 
     /**
@@ -172,10 +186,9 @@ public class CreateMeetingActivity extends AppCompatActivity {
         for (Room room : Room.values()) {
             roomList.add(room.getRoomName());
         }
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.room_list_item, roomList);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, roomList);
         binding.chooseRoomTextV.setAdapter(adapter);
-        checkInfoCompleted();
+        //checkInfoCompleted();
     }
 
     private void getRoomSelected() {
@@ -185,10 +198,10 @@ public class CreateMeetingActivity extends AppCompatActivity {
 
     private void createTheMeeting() {
         long idMeetingCreated = createMeetingViewModel.generateId();
-        LocalDate dateMeetingCreated = createMeetingViewModel.parseToLocalDate(binding.datepicker.getText().toString());
-        LocalTime hourMeetingCreated = createMeetingViewModel.parseToLocalTime(binding.timepicker.getText().toString());
+        LocalDate dateMeetingCreated = createMeetingViewModel.parseToLocalDate(Objects.requireNonNull(binding.datepicker.getText()).toString());
+        LocalTime hourMeetingCreated = createMeetingViewModel.parseToLocalTime(Objects.requireNonNull(binding.timepicker.getText()).toString());
         Room roomMeetingCreated = createMeetingViewModel.parseToRoom(selectedRoom);
-        String subjectMeetingCreated = binding.subject.getText().toString();
+        String subjectMeetingCreated = Objects.requireNonNull(binding.subject.getText()).toString();
 
         createMeetingViewModel.createMeeting(new Meeting(idMeetingCreated,
                 dateMeetingCreated,
@@ -196,5 +209,7 @@ public class CreateMeetingActivity extends AppCompatActivity {
                 roomMeetingCreated,
                 subjectMeetingCreated,
                 emailsParticipants));
+        finish();
     }
+
 }

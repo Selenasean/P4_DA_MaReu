@@ -6,6 +6,7 @@
     <string name="between">-</string>
     <string name="descriptionFab">add new meeting</string>
 
+    <!--Strings for create activity-->
     <string name="create_meeting_title">Créez votre réunion ! </string>
     <string name="magic">🪄</string>
     <string name="hint_room">Choisissez la salle</string>
@@ -14,6 +15,13 @@
     <string name="hint_time">L\'heure</string>
     <string name="time_picker_text">Chosissez l\'heure de la réunion</string>
     <string name="hint_subject">Le sujet de la réunion</string>
-    <string name="hint_participants">Les participants (min. 3 personnes)</string>
+    <string name="hint_participants">Les participants</string>
     <string name="creation">Création ✨</string>
+
+    <!--Strings for menu filter -->
+    <string name="filter_date">📅 Filtrer par date</string>
+    <string name="filter_room">📍 Filtrer par lieu</string>
+    <string name="filter_return">🔎 Toutes les réunions</string>
+    <string name="choose_room_menu">☝🏻 Choisissez le lieu :</string>
+    <string name="no_meeting_founded">⚠️Aucunes réunions correspondantes</string>
 </resources>

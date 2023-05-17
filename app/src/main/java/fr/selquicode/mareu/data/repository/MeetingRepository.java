@@ -63,39 +63,6 @@ public class MeetingRepository {
         return id;
     }
 
-    /**
-     * To filtrate the meeting's list by date
-     *
-     * @param date
-     * @return
-     */
-    public LiveData<List<Meeting>> getMeetingsFilterByDate(LocalDate date) {
-        List<Meeting> meetingsList = meetingsMutableLiveData.getValue();
-        MutableLiveData<List<Meeting>> list = new MutableLiveData<>(new ArrayList<>());
-
-        for (Meeting meeting : meetingsList) {
-            if (date.equals(meeting.getDate())) {
-                list.setValue(Arrays.asList(meeting));
-            }
-        }
-        return list;
-    }
-
-    /**
-     * To filtrate the meeting's list by room
-     *
-     * @param room
-     * @return
-     */
-    public LiveData<List<Meeting>> getMeetingsFilterByPlace(Room room) {
-        List<Meeting> meetingsList = meetingsMutableLiveData.getValue();
-        MutableLiveData<List<Meeting>> list = new MutableLiveData<>(new ArrayList<>());
-
-        for (Meeting meeting : meetingsList) {
-            if (room.equals(meeting.getRoom())) list.setValue(Arrays.asList(meeting));
-        }
-        return list;
-    }
 
 
 }

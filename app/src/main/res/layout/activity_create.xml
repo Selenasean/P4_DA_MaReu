@@ -82,13 +82,14 @@
         <com.google.android.material.textfield.TextInputLayout
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:id="@+id/date_picker_lyt"
-            android:layout_width="200dp"
+            android:layout_width="160dp"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:hint="@string/hint_date"
             android:textColorHint="@color/black"
             android:layout_marginTop="20dp"
             android:layout_marginStart="20dp"
+            android:layout_marginEnd="16dp"
             app:startIconDrawable="@drawable/ic_calendar_black"
             app:layout_constraintTop_toBottomOf="@+id/choose_text"
             app:layout_constraintStart_toStartOf="parent">
@@ -109,10 +110,11 @@
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:hint="@string/hint_time"
+            android:layout_marginEnd="20dp"
             android:textColorHint="@color/black"
             app:startIconDrawable="@drawable/ic_hour_black"
             app:layout_constraintTop_toTopOf="@+id/date_picker_lyt"
-            app:layout_constraintStart_toEndOf="@id/date_picker_lyt"
+
             app:layout_constraintEnd_toEndOf="parent">
 
             <com.google.android.material.textfield.TextInputEditText
@@ -201,15 +203,15 @@
             android:id="@+id/btn_create"
             android:layout_width="200dp"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/chip_group"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
             android:layout_margin="40dp"
+            android:layout_marginTop="32dp"
+            android:theme="@style/ThemeOverlay.Button.Red"
             android:padding="15dp"
-            android:backgroundTint="@color/red"
             android:text="@string/creation"
             android:textSize="20sp"
-            />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/chip_group" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

@@ -43,7 +43,24 @@ public class CreateMeetingViewState {
         this.subject = subject;
         this.members = members;
     }
-    
+
+    /**
+     * Computed property that depends on other values of the ViewState
+     * @return boolean
+     */
+    public Boolean isCreatedEnabled(){
+        if(roomName != null && subject != null && members != null){
+            if(roomName.isEmpty()
+                    || date.isEmpty()
+                    || hour.isEmpty()
+                    || subject.isEmpty()
+                    || members.size() == 0) {
+                return false;
+            }else{
+                return true;
+            }
+        } else return false;
+    }
 
     @Nullable
     public String getSubject() {

@@ -1,4 +1,4 @@
-package fr.selquicode.mareu.ui.injection;
+package fr.selquicode.mareu.ui.utils.injection;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModel;
