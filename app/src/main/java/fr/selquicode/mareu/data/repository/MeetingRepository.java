@@ -3,14 +3,10 @@ package fr.selquicode.mareu.data.repository;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import fr.selquicode.mareu.data.SuperMeetingGenerator;
 import fr.selquicode.mareu.data.model.Meeting;
-import fr.selquicode.mareu.data.model.Room;
 
 /**
  * Data source for meetings
@@ -18,7 +14,8 @@ import fr.selquicode.mareu.data.model.Room;
 public class MeetingRepository {
 
     private final MutableLiveData<List<Meeting>> meetingsMutableLiveData = new MutableLiveData<>(SuperMeetingGenerator.SUPER_MEETINGS);
-    long id = 4;
+    long lowestMeetingId = 4;
+
 
     public LiveData<List<Meeting>> getMeetingsLiveData() {
         return meetingsMutableLiveData;
@@ -26,7 +23,6 @@ public class MeetingRepository {
 
     /**
      * To delete a meeting from the list
-     *
      * @param id of the meeting selected
      */
     public void deleteMeeting(long id) {
@@ -45,7 +41,6 @@ public class MeetingRepository {
 
     /**
      * To create a new meeting
-     *
      * @param meeting
      */
     public void createMeeting(Meeting meeting) {
@@ -59,8 +54,8 @@ public class MeetingRepository {
      * To generate an id for a created meeting
      */
     public long generateId(){
-        id++;
-        return id;
+        long incrementId =lowestMeetingId++;
+        return incrementId;
     }
 
 

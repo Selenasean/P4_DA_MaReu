@@ -1,6 +1,5 @@
 package fr.selquicode.mareu.ui.list;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,7 +16,7 @@ import fr.selquicode.mareu.databinding.MeetingItemBinding;
 /**
  * Class displaying data in RecycleView
  */
-public class MeetingAdapter extends ListAdapter<MeetingsViewState, MeetingAdapter.ViewHolder> {
+public class MeetingAdapter extends ListAdapter<MeetingViewState, MeetingAdapter.ViewHolder> {
 
     @NonNull
     private final OnMeetingClickedListener listener;
@@ -46,7 +45,7 @@ public class MeetingAdapter extends ListAdapter<MeetingsViewState, MeetingAdapte
             circleColorRoom = binding.imageMeeting;
         }
 
-        public void bind(MeetingsViewState item, OnMeetingClickedListener listener) {
+        public void bind(MeetingViewState item, OnMeetingClickedListener listener) {
             date.setText(item.getDate());
             subject.setText(item.getSubject());
             room.setText(item.getRoomName());
@@ -80,15 +79,15 @@ public class MeetingAdapter extends ListAdapter<MeetingsViewState, MeetingAdapte
     /**
      * method that compare two item and their content to update them if it's necessary
      */
-    public static final DiffUtil.ItemCallback<MeetingsViewState> DIFF_CALLBACK =
-            new DiffUtil.ItemCallback<MeetingsViewState>() {
+    public static final DiffUtil.ItemCallback<MeetingViewState> DIFF_CALLBACK =
+            new DiffUtil.ItemCallback<MeetingViewState>() {
                 @Override
-                public boolean areItemsTheSame(@NonNull MeetingsViewState oldItem, @NonNull MeetingsViewState newItem) {
+                public boolean areItemsTheSame(@NonNull MeetingViewState oldItem, @NonNull MeetingViewState newItem) {
                     return oldItem.getId() == newItem.getId();
                 }
 
                 @Override
-                public boolean areContentsTheSame(@NonNull MeetingsViewState oldItem, @NonNull MeetingsViewState newItem) {
+                public boolean areContentsTheSame(@NonNull MeetingViewState oldItem, @NonNull MeetingViewState newItem) {
                     return oldItem.equals(newItem);
                 }
 

@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -54,11 +55,22 @@ public class MeetingsActivity extends AppCompatActivity implements OnMeetingClic
      */
     private void setViewModel() {
         meetingsViewModel = new ViewModelProvider(this, ViewModelFactory.getInstance()).get(MeetingsViewModel.class);
-
-        final Observer<List<MeetingsViewState>> listObserver = listMeetingVS -> mListAdapter.submitList(listMeetingVS);
-        meetingsViewModel.getMeetings().observe(this, listObserver);
+        meetingsViewModel.getMeetings().observe(this, listViewState -> {
+                mListAdapter.submitList(listViewState);
+                if(mListAdapter.getCurrentList().size() == 0){
+                    binding.noMeetingFounded.setVisibility(View.VISIBLE);
+                    binding.noMeetingFounded.setText(R.string.no_meeting);
+                    binding.listMeetings.setVisibility(View.GONE);
+                }else{
+                    binding.noMeetingFounded.setVisibility(View.GONE);
+                    binding.listMeetings.setVisibility(View.VISIBLE);
+                }
+            });
     }
 
+    /**
+     * Settings for Recycleview
+     */
     private void setRecycleView(){
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(this, DividerItemDecoration.VERTICAL);
         RecyclerView mRecycleView = binding.listMeetings;

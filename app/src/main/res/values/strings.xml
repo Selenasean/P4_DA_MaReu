@@ -24,4 +24,7 @@
     <string name="filter_return">🔎 Toutes les réunions</string>
     <string name="choose_room_menu">☝🏻 Choisissez le lieu :</string>
     <string name="no_meeting_founded">⚠️Aucunes réunions correspondantes</string>
+
+    <!-- String message for meeting list -->
+    <string name="no_meeting"> Pas de réunion trouvée </string>
 </resources>

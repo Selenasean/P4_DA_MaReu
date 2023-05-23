@@ -8,6 +8,18 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true" >
 
+    <TextView
+        android:id="@+id/no_meeting_founded"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingTop="80dp"
+        android:textSize="18sp"
+        android:textColor="@color/black"
+        android:gravity="center_horizontal"
+        tools:text="NO MEETINGS FOUNDED"
+        />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/list_meetings"
         android:layout_width="match_parent"

@@ -5,6 +5,10 @@ import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
 
+import java.util.ArrayList;
+import java.util.List;
+
+import fr.selquicode.mareu.data.model.Meeting;
 import fr.selquicode.mareu.data.repository.MeetingRepository;
 import fr.selquicode.mareu.ui.create.CreateMeetingViewModel;
 import fr.selquicode.mareu.ui.list.MeetingsViewModel;

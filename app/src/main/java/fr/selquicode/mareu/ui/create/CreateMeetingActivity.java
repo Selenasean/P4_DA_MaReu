@@ -7,13 +7,12 @@ import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
+
 import android.widget.ArrayAdapter;
 
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.chip.Chip;
@@ -38,6 +37,7 @@ public class CreateMeetingActivity extends AppCompatActivity {
 
     private ActivityCreateBinding binding;
     private CreateMeetingViewModel createMeetingViewModel;
+
     public ZoneId z = ZoneId.of("Europe/Paris");
     public ZonedDateTime zdt = ZonedDateTime.now(z);
     @NonNull
@@ -47,8 +47,8 @@ public class CreateMeetingActivity extends AppCompatActivity {
 
     /**
      * To navigate from mainActivity to here
-     * @param context
-     * @return
+     * @param context : of the actual activity
+     * @return Intent
      */
     @NonNull
     public static Intent navigate(Context context) {
@@ -84,12 +84,7 @@ public class CreateMeetingActivity extends AppCompatActivity {
 
     private void setViewModel() {
         createMeetingViewModel = new ViewModelProvider(this, ViewModelFactory.getInstance()).get(CreateMeetingViewModel.class);
-        createMeetingViewModel.getCreatedMeetingLiveData().observe(this, new Observer<CreateMeetingViewState>() {
-            @Override
-            public void onChanged(CreateMeetingViewState state) {
-                CreateMeetingActivity.this.render(state);
-            }
-        });
+        createMeetingViewModel.getCreatedMeetingLiveData().observe(this, state -> CreateMeetingActivity.this.render(state));
     }
 
     private void render(CreateMeetingViewState state) {
@@ -119,13 +114,10 @@ public class CreateMeetingActivity extends AppCompatActivity {
         chip.setText(Objects.requireNonNull(participantsTextInput.getText()).toString());
         chip.setChipIconResource(R.drawable.ic_person_black);
         chip.setCloseIconVisible(true);
-        chip.setOnCloseIconClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                binding.chipGroup.removeView(chip);
-                emailsParticipants.remove(chip.getText().toString());
-                //checkInfoCompleted();
-            }
+        chip.setOnCloseIconClickListener(v -> {
+            binding.chipGroup.removeView(chip);
+            emailsParticipants.remove(chip.getText().toString());
+            //checkInfoCompleted();
         });
         binding.chipGroup.addView(chip);
         emailsParticipants.add(chip.getText().toString());
@@ -165,10 +157,8 @@ public class CreateMeetingActivity extends AppCompatActivity {
         int minute = zdt.getMinute();
 
         //set time picker dialog
-        TimePickerDialog.OnTimeSetListener timePickerListener = (timePicker, selectedHour, selectedMinute) -> {
-            binding.timepicker.setText(String.format(Locale.getDefault(), "%02d:%02d", selectedHour, selectedMinute));
-
-        };
+        TimePickerDialog.OnTimeSetListener timePickerListener = (timePicker, selectedHour, selectedMinute) ->
+                binding.timepicker.setText(String.format(Locale.getDefault(), "%02d:%02d", selectedHour, selectedMinute));
         int style = AlertDialog.THEME_HOLO_LIGHT;
         TimePickerDialog timePickerDialog = new TimePickerDialog(this, style, timePickerListener, hour, minute, true);
         timePickerDialog.setTitle(R.string.time_picker_text);

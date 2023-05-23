@@ -1,14 +1,10 @@
 package fr.selquicode.mareu.ui.list;
 
-import static com.google.android.material.internal.ContextUtils.getActivity;
 
-import android.util.Log;
-import android.widget.Toast;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModel;
 
 import java.time.LocalDate;
@@ -16,7 +12,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-import fr.selquicode.mareu.R;
 import fr.selquicode.mareu.data.model.Meeting;
 import fr.selquicode.mareu.data.repository.MeetingRepository;
 
@@ -27,7 +22,7 @@ public class MeetingsViewModel extends ViewModel {
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     private final DateTimeFormatter formatterHour = DateTimeFormatter.ofPattern("HH'h'mm");
 
-    private final MediatorLiveData<List<MeetingsViewState>> meetingsListMediatorLiveData = new MediatorLiveData<>();
+    private final MediatorLiveData<List<MeetingViewState>> meetingsListMediatorLiveData = new MediatorLiveData<>();
     private final MutableLiveData<LocalDate> dateToFilterMutableLiveData = new MutableLiveData<>();
     private final MutableLiveData<String> roomToFilterMutableLiveData = new MutableLiveData<>();
 
@@ -64,9 +59,9 @@ public class MeetingsViewModel extends ViewModel {
     /**
      * Method that filter the original list depending on filters chosen by user
      * Also combine 3 parameters -parsed into List<MeetingsViewState>>- to produce a MediatorLiveData
-     * @param meetings
-     * @param dateToFilter
-     * @param roomToFilter
+     * @param meetings : list of meetings
+     * @param dateToFilter : date type LocalDate
+     * @param roomToFilter : room name type String
      */
     private void combine(List<Meeting> meetings, LocalDate dateToFilter, String roomToFilter){
         if(meetings == null){
@@ -79,7 +74,7 @@ public class MeetingsViewModel extends ViewModel {
                 && (roomToFilter == null || meeting.getRoom().getRoomName().equals(roomToFilter))){
 
                 filteredMeetings.add(meeting);
-                List<MeetingsViewState> filteredMeetingsVS = parseToViewState(filteredMeetings);
+                List<MeetingViewState> filteredMeetingsVS = parseToViewState(filteredMeetings);
                 meetingsListMediatorLiveData.setValue(filteredMeetingsVS);
             }
         }
@@ -92,14 +87,14 @@ public class MeetingsViewModel extends ViewModel {
 
     /**
      * Method that transform a list into a ViewState list -which is the UI model-
-     * @param listMeetings
+     * @param listMeetings : a list of meeting type List<Meeting>
      * @return meetingsViewState list for the UI
      */
-    private List<MeetingsViewState> parseToViewState(List<Meeting> listMeetings) {
-        List<MeetingsViewState> meetingsViewState = new ArrayList<>();
+    private List<MeetingViewState> parseToViewState(List<Meeting> listMeetings) {
+        List<MeetingViewState> meetingViewState = new ArrayList<>();
 
         for(Meeting meeting : listMeetings){
-            meetingsViewState.add(new MeetingsViewState(
+            meetingViewState.add(new MeetingViewState(
                     meeting.getId(),
                     meeting.getDate().format(formatter),
                     meeting.getHour().format(formatterHour),
@@ -109,20 +104,17 @@ public class MeetingsViewModel extends ViewModel {
                     meeting.getRoom().getRoomColor()
                     ));
         }
-        return meetingsViewState;
+        return meetingViewState;
     }
 
     /**
      * Get all meetings
      * @return List of meetings type LiveData
      */
-    public LiveData<List<MeetingsViewState>> getMeetings(){
+    public LiveData<List<MeetingViewState>> getMeetings(){
         return meetingsListMediatorLiveData;
     }
 
-    /**
-     * Logic method for delete a meeting
-     */
     public void onDeleteMeetingClicked(long meetingId){
         mRepository.deleteMeeting(meetingId);
     }

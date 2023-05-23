@@ -9,7 +9,7 @@ import java.util.Objects;
  * This is the model of the view that the data have to fit into
  * ViewState contains data model use for displaying the View
  */
-public class MeetingsViewState {
+public class MeetingViewState {
 
     @NonNull
     private final long id;
@@ -30,13 +30,13 @@ public class MeetingsViewState {
      * @param subject
      * @param meetingMembers
      */
-    public MeetingsViewState(long id,
-                             @NonNull String date,
-                             @NonNull String hour,
-                             @NonNull String roomName,
-                             @NonNull String subject,
-                             @NonNull String meetingMembers,
-                             @NonNull int colorRoom) {
+    public MeetingViewState(long id,
+                            @NonNull String date,
+                            @NonNull String hour,
+                            @NonNull String roomName,
+                            @NonNull String subject,
+                            @NonNull String meetingMembers,
+                            @NonNull int colorRoom) {
         this.id = id;
         this.date = date;
         this.hour = hour;
@@ -83,8 +83,8 @@ public class MeetingsViewState {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof MeetingsViewState)) return false;
-        MeetingsViewState that = (MeetingsViewState) o;
+        if (!(o instanceof MeetingViewState)) return false;
+        MeetingViewState that = (MeetingViewState) o;
         return getId() == that.getId() && getColorRoom() == that.getColorRoom() && getDate().equals(that.getDate()) && getHour().equals(that.getHour()) && getRoomName().equals(that.getRoomName()) && getSubject().equals(that.getSubject()) && getMeetingMembers().equals(that.getMeetingMembers());
     }
 
