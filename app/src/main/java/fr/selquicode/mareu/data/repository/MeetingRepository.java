@@ -5,7 +5,6 @@ import androidx.lifecycle.MutableLiveData;
 
 import java.util.List;
 
-import fr.selquicode.mareu.data.SuperMeetingGenerator;
 import fr.selquicode.mareu.data.model.Meeting;
 
 /**
@@ -13,9 +12,11 @@ import fr.selquicode.mareu.data.model.Meeting;
  */
 public class MeetingRepository {
 
-    private final MutableLiveData<List<Meeting>> meetingsMutableLiveData = new MutableLiveData<>(SuperMeetingGenerator.SUPER_MEETINGS);
-    long lowestMeetingId = 4;
+    private final MutableLiveData<List<Meeting>> meetingsMutableLiveData = new MutableLiveData<>();
 
+    public MeetingRepository(List<Meeting> meetings) {
+        meetingsMutableLiveData.setValue(meetings);
+    }
 
     public LiveData<List<Meeting>> getMeetingsLiveData() {
         return meetingsMutableLiveData;
@@ -50,14 +51,13 @@ public class MeetingRepository {
         meetingsMutableLiveData.setValue(meetingsList);
     }
 
+
     /**
      * To generate an id for a created meeting
      */
+    long lowestMeetingId = 5;
     public long generateId(){
-        long incrementId =lowestMeetingId++;
-        return incrementId;
+        return (lowestMeetingId++);
     }
-
-
 
 }

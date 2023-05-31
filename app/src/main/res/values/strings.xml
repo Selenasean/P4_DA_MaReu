@@ -17,6 +17,7 @@
     <string name="hint_subject">Le sujet de la réunion</string>
     <string name="hint_participants">Les participants</string>
     <string name="creation">Création ✨</string>
+    <string name="error_email">Email invalide !</string>
 
     <!--Strings for menu filter -->
     <string name="filter_date">📅 Filtrer par date</string>

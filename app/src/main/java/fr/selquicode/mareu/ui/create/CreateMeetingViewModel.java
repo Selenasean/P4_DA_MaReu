@@ -1,8 +1,6 @@
 package fr.selquicode.mareu.ui.create;
 
-import android.content.Context;
 import android.util.Patterns;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;
@@ -12,62 +10,65 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Locale;
 
 import fr.selquicode.mareu.data.model.Meeting;
 import fr.selquicode.mareu.data.model.Room;
 import fr.selquicode.mareu.data.repository.MeetingRepository;
+import fr.selquicode.mareu.ui.utils.SingleLiveEvent;
 
 public class CreateMeetingViewModel extends ViewModel {
 
     private MeetingRepository mRepository;
-    private MutableLiveData<CreateMeetingViewState> createdMeetingLV = new MutableLiveData<>();
+    private MutableLiveData<CreateMeetingViewState> createdMeetingMutableLiveData = new MutableLiveData<>();
     private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-    private final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH'h'mm");
+    private final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
 
     private LocalDate date;
+    private LocalTime time;
 
-    public CreateMeetingViewModel(MeetingRepository repository){
+    private final SingleLiveEvent<Void> closeActivity = new SingleLiveEvent<>();
+
+    public CreateMeetingViewModel(MeetingRepository repository) {
         mRepository = repository;
-    }
-
-    /**
-     * Generate a id
-     */
-    public long generateId(){ return mRepository.generateId(); }
-
-    /**
-     * Method to add a meeting in dataBase
-     */
-    public void createMeeting(Meeting meeting){
-        mRepository.createMeeting(meeting);
     }
 
     /**
      * Get meeting created by user
      * @return meeting type LiveData
      */
-    public MutableLiveData<CreateMeetingViewState> getCreatedMeetingLiveData(){
-        return createdMeetingLV;
+    public MutableLiveData<CreateMeetingViewState> getCreatedMeetingLiveData() {
+        return createdMeetingMutableLiveData;
     }
 
     /**
-     * Check if email is valid and pop an error message if it is not
-     * @param email
-     * @param context
-     * @return
+     * Method to add a meeting in dataBase
+     * @param date String of date
+     * @param hour String of hour
+     * @param room String of room's name
+     * @param subject String
+     * @param email list of participant's emails
      */
-    public boolean isEmailValid(String email, Context context){
-        if(!email.isEmpty()){
-            if(Patterns.EMAIL_ADDRESS.matcher(email).matches()){
-                return true;
-            } else{
-                Toast.makeText(context, "Email invalide !", Toast.LENGTH_SHORT).show();
-                return false;
-            }
-        }else{
-            return false;
-        }
+    public void createMeeting(@NonNull String date,
+                              @NonNull String hour,
+                              @NonNull String room,
+                              @NonNull String subject,
+                              @NonNull List<String> email) {
+
+        LocalDate dateMeeting = parseToLocalDate(date);
+        LocalTime timeMeeting = parseToLocalTime(hour);
+        Room roomMeeting = parseToRoom(room);
+
+        mRepository.createMeeting(new Meeting(
+                mRepository.generateId(),
+                dateMeeting,
+                timeMeeting,
+                roomMeeting,
+                subject,
+                email
+        ));
+
+        //finally close activity
+        closeActivity.call();
     }
 
     /**
@@ -75,28 +76,25 @@ public class CreateMeetingViewModel extends ViewModel {
      * @param roomName
      * @return
      */
-    public Room parseToRoom(String roomName){
+    public Room parseToRoom(String roomName) {
         Room roomSelected = Room.ROOM1;
-        for(Room room : Room.values()){
-            if(roomName == room.getRoomName()){
+        for (Room room : Room.values()) {
+            if (roomName == room.getRoomName()) {
                 roomSelected = room;
                 break;
             }
         }
         return roomSelected;
     }
+
     /**
      * Parse string date into LocalDate format
      * @param date
      * @return
      */
-    public LocalDate parseToLocalDate(String date){
+    public LocalDate parseToLocalDate(String date) {
         LocalDate localDate = LocalDate.parse(date, dateFormatter);
         return localDate;
-    }
-
-    public String formatDate(int dayOfMonth, int month, int year) {
-        return String.format(Locale.FRANCE, "%02d/%02d/%04d", dayOfMonth, month, year);
     }
 
     /**
@@ -104,9 +102,26 @@ public class CreateMeetingViewModel extends ViewModel {
      * @param hour
      * @return
      */
-    public LocalTime parseToLocalTime(String hour){
+    public LocalTime parseToLocalTime(String hour) {
         LocalTime localTime = LocalTime.parse(hour, timeFormatter);
         return localTime;
+    }
+
+    /**
+     * Check if email is valid and faithful to email pattern
+     * @param email
+     * @return boolean
+     */
+    public boolean isEmailValid(String email) {
+        if (!email.isEmpty()) {
+            if (Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -116,10 +131,11 @@ public class CreateMeetingViewModel extends ViewModel {
      * @param year
      */
     public void onDateChanged(int dayOfMonth, int month, int year) {
-        date = LocalDate.of(year, (month +1), dayOfMonth);
+        date = LocalDate.of(year, month + 1, dayOfMonth);
 
-        CreateMeetingViewState currentState =  createdMeetingLV.getValue();
-        if(currentState != null){
+        //get LiveData value at instant T
+        CreateMeetingViewState currentState = createdMeetingMutableLiveData.getValue();
+        if (currentState != null) {
             CreateMeetingViewState newState = new CreateMeetingViewState(
                     currentState.getRoomName(),
                     dateFormatter.format(date),
@@ -127,7 +143,71 @@ public class CreateMeetingViewModel extends ViewModel {
                     currentState.getSubject(),
                     currentState.getMembers()
             );
-            createdMeetingLV.setValue(newState);
+            createdMeetingMutableLiveData.setValue(newState);
         }
+    }
+
+    /**
+     * Method that update the ViewState with the time chosen by the user
+     * @param selectedHour
+     * @param selectedMinute
+     */
+    public void onTimeChanged(int selectedHour, int selectedMinute) {
+        time = LocalTime.of(selectedHour, selectedMinute);
+
+        CreateMeetingViewState currentState = createdMeetingMutableLiveData.getValue();
+        if (currentState != null){
+            CreateMeetingViewState newState = new CreateMeetingViewState(
+                    currentState.getRoomName(),
+                    currentState.getDate(),
+                    timeFormatter.format(time),
+                    currentState.getSubject(),
+                    currentState.getMembers()
+            );
+            createdMeetingMutableLiveData.setValue(newState);
+        }
+    }
+
+    /**
+     * Method to update the ViewState with the subject -type String- written by user
+     */
+    public void onSubjectChanged(String subject){
+        CreateMeetingViewState currentState = createdMeetingMutableLiveData.getValue();
+        if(currentState != null){
+            CreateMeetingViewState newState = new CreateMeetingViewState(
+                    currentState.getRoomName(),
+                    currentState.getDate(),
+                    currentState.getHour(),
+                    subject,
+                    currentState.getMembers()
+            );
+            createdMeetingMutableLiveData.setValue(newState);
+        }
+    }
+
+    /**
+     * Method to update the ViewState with the room -type String- written by user
+     * @param selectedRoom
+     */
+    public void onRoomChanged(String selectedRoom) {
+        CreateMeetingViewState currentState = createdMeetingMutableLiveData.getValue();
+        if(currentState != null){
+            CreateMeetingViewState newState = new CreateMeetingViewState(
+                    selectedRoom,
+                    currentState.getDate(),
+                    currentState.getHour(),
+                    currentState.getSubject(),
+                    currentState.getMembers()
+            );
+            createdMeetingMutableLiveData.setValue(newState);
+        }
+    }
+
+    /**
+     * Called in CreateNewMeetingActivity to close activity
+     * @return SingleLiveEvent -type Void-
+     */
+    public SingleLiveEvent<Void> getCloseActivity() {
+        return closeActivity;
     }
 }

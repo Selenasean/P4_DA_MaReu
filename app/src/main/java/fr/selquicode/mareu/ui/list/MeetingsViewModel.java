@@ -72,16 +72,15 @@ public class MeetingsViewModel extends ViewModel {
         for(Meeting meeting : meetings){
             if((dateToFilter == null || meeting.getDate().equals(dateToFilter))
                 && (roomToFilter == null || meeting.getRoom().getRoomName().equals(roomToFilter))){
-
                 filteredMeetings.add(meeting);
-                List<MeetingViewState> filteredMeetingsVS = parseToViewState(filteredMeetings);
-                meetingsListMediatorLiveData.setValue(filteredMeetingsVS);
             }
         }
-        //Call in a different method ?
+        //parse into ViewState
+        List<MeetingViewState> filteredMeetingsVS = parseToViewState(filteredMeetings);
+        meetingsListMediatorLiveData.setValue(filteredMeetingsVS);
+
         if(filteredMeetings.size() == 0){
             meetingsListMediatorLiveData.setValue(null);
-            //DISPLAY ERROR MESSAGE - NO MEETING FOUNDED use SingleLiveEvent (=LiveData) or an event Wrapper with mutableLiveData
         }
     }
 
@@ -115,22 +114,45 @@ public class MeetingsViewModel extends ViewModel {
         return meetingsListMediatorLiveData;
     }
 
+    /**
+     * delete a meeting
+     * @param meetingId
+     */
     public void onDeleteMeetingClicked(long meetingId){
         mRepository.deleteMeeting(meetingId);
     }
 
+    /**
+     * parse date into right format
+     * @param year
+     * @param month
+     * @param dayOfMonth
+     * @return
+     */
     public LocalDate formatDate(int year, int month, int dayOfMonth) {
         return LocalDate.of(year, month, dayOfMonth);
     }
 
+    /**
+     * Filter by date using date chosen by user
+     * @param date
+     */
     public void filterByDate(LocalDate date) {
         dateToFilterMutableLiveData.setValue(date);
     }
 
+    /**
+     * Reset filter by making value null for each filter
+     */
     public void resetFilters() {
         dateToFilterMutableLiveData.setValue(null);
         roomToFilterMutableLiveData.setValue(null);
     }
+
+    /**
+     * Filter by room using room chosen by user
+     * @param room
+     */
 
     public void filterByRoom(String room) {
         roomToFilterMutableLiveData.setValue(room);

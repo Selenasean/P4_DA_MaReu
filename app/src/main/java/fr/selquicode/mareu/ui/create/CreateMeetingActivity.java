@@ -74,6 +74,9 @@ public class CreateMeetingActivity extends AppCompatActivity {
         configureRoomChoice();
         getRoomSelected();
 
+        //update subject
+        getSubjectWritten();
+
         // settings for participants' list
         displayParticipantEmail();
 
@@ -82,89 +85,38 @@ public class CreateMeetingActivity extends AppCompatActivity {
         binding.btnCreate.setOnClickListener(v -> createTheMeeting());
     }
 
+    /**
+     * Settings for viewModel & Observer for the UI
+     */
     private void setViewModel() {
         createMeetingViewModel = new ViewModelProvider(this, ViewModelFactory.getInstance()).get(CreateMeetingViewModel.class);
-        createMeetingViewModel.getCreatedMeetingLiveData().observe(this, state -> CreateMeetingActivity.this.render(state));
+        createMeetingViewModel.getCreatedMeetingLiveData().observe(this, this::render);
+
+        // observer for closing activity when createTheMeeting is called
+        createMeetingViewModel.getCloseActivity().observe(this, closeActivitySingleLiveEvent -> finish());
     }
 
-    private void render(CreateMeetingViewState state) {
+    /**
+     * Render method to display the correct info regarding the state of the UI
+     * @param state
+     */
+    private void render(@NonNull CreateMeetingViewState state) {
         //refresh UI
-        binding.datepicker.setText(state.getDate());
+        if(!binding.chooseRoomTextV.getText().toString().equals(state.getRoomName())){
+            binding.chooseRoomTextV.setText(state.getRoomName());
+        }
+        if(!Objects.requireNonNull(binding.datepicker.getText()).toString().equals(state.getDate())){
+            binding.datepicker.setText(state.getDate());
+        }
+        if(!Objects.requireNonNull(binding.timepicker.getText()).toString().equals(state.getHour())){
+            binding.timepicker.setText(state.getHour());
+        }
+        if(!Objects.requireNonNull(binding.subject.getText()).toString().equals(state.getSubject())){
+               binding.subject.setText(state.getSubject());
+        }
 
         //enabled create btn
         binding.btnCreate.setEnabled(state.isCreatedEnabled());
-    }
-
-
-    /**
-     * Display chips of participants'email regarding the input
-     */
-    private void displayParticipantEmail() {
-        TextInputEditText emailInput = binding.participantsTextInput;
-        binding.addEmailParticipant.setOnClickListener(v -> {
-            if(createMeetingViewModel.isEmailValid(emailInput.getEditableText().toString(), this)){
-                configureParticipantChip(emailInput);
-                emailInput.setText("");
-            }
-        });
-    }
-
-    private void configureParticipantChip(@NonNull TextInputEditText participantsTextInput) {
-        Chip chip = new Chip(this);
-        chip.setText(Objects.requireNonNull(participantsTextInput.getText()).toString());
-        chip.setChipIconResource(R.drawable.ic_person_black);
-        chip.setCloseIconVisible(true);
-        chip.setOnCloseIconClickListener(v -> {
-            binding.chipGroup.removeView(chip);
-            emailsParticipants.remove(chip.getText().toString());
-            //checkInfoCompleted();
-        });
-        binding.chipGroup.addView(chip);
-        emailsParticipants.add(chip.getText().toString());
-        //checkInfoCompleted();
-    }
-
-    /**
-     * Method to init the date picker
-     */
-    private void configureDatePicker() {
-        int mDay = zdt.getDayOfMonth();
-        int mMonth = zdt.getMonthValue();
-        int mYear = zdt.getYear();
-
-        // set date picker dialog
-        int style = AlertDialog.THEME_HOLO_LIGHT;
-        DatePickerDialog datePickerDialog = new DatePickerDialog(this,
-                style,
-                (view, year, month, dayOfMonth) -> {
-                    createMeetingViewModel.onDateChanged(dayOfMonth, month, year);
-                    // String date = createMeetingViewModel.formatDate(dayOfMonth, (month + 1), year);
-                    //binding.datepicker.setText(date);
-                },
-                mYear,
-                (mMonth - 1),
-                mDay);
-        datePickerDialog.getDatePicker().setMinDate(zdt.toInstant().toEpochMilli());
-        datePickerDialog.show();
-        //checkInfoCompleted();
-    }
-
-    /**
-     * Method to init the time picker
-     */
-    private void configureTimePicker() {
-        int hour = zdt.getHour();
-        int minute = zdt.getMinute();
-
-        //set time picker dialog
-        TimePickerDialog.OnTimeSetListener timePickerListener = (timePicker, selectedHour, selectedMinute) ->
-                binding.timepicker.setText(String.format(Locale.getDefault(), "%02d:%02d", selectedHour, selectedMinute));
-        int style = AlertDialog.THEME_HOLO_LIGHT;
-        TimePickerDialog timePickerDialog = new TimePickerDialog(this, style, timePickerListener, hour, minute, true);
-        timePickerDialog.setTitle(R.string.time_picker_text);
-        timePickerDialog.show();
-
-        //checkInfoCompleted();
     }
 
     /**
@@ -178,28 +130,111 @@ public class CreateMeetingActivity extends AppCompatActivity {
         }
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, roomList);
         binding.chooseRoomTextV.setAdapter(adapter);
-        //checkInfoCompleted();
     }
 
+    /**
+     * Method to save in variable the room selected and update te ViewState
+     */
     private void getRoomSelected() {
         binding.chooseRoomTextV.setOnItemClickListener((adapterView, v, position, id) ->
                 selectedRoom = adapterView.getItemAtPosition(position).toString());
+        createMeetingViewModel.onRoomChanged(selectedRoom);
     }
 
-    private void createTheMeeting() {
-        long idMeetingCreated = createMeetingViewModel.generateId();
-        LocalDate dateMeetingCreated = createMeetingViewModel.parseToLocalDate(Objects.requireNonNull(binding.datepicker.getText()).toString());
-        LocalTime hourMeetingCreated = createMeetingViewModel.parseToLocalTime(Objects.requireNonNull(binding.timepicker.getText()).toString());
-        Room roomMeetingCreated = createMeetingViewModel.parseToRoom(selectedRoom);
-        String subjectMeetingCreated = Objects.requireNonNull(binding.subject.getText()).toString();
+    /**
+     * Method to init the date picker
+     * & update the viewState with date selected by user
+     */
+    private void configureDatePicker() {
+        int mDay = zdt.getDayOfMonth();
+        int mMonth = zdt.getMonthValue();
+        int mYear = zdt.getYear();
 
-        createMeetingViewModel.createMeeting(new Meeting(idMeetingCreated,
-                dateMeetingCreated,
-                hourMeetingCreated,
-                roomMeetingCreated,
-                subjectMeetingCreated,
-                emailsParticipants));
-        finish();
+        // set date picker dialog
+        int style = AlertDialog.THEME_HOLO_LIGHT;
+        DatePickerDialog datePickerDialog = new DatePickerDialog(this,
+                style,
+                (view, year, month, dayOfMonth) -> {
+                    createMeetingViewModel.onDateChanged(dayOfMonth, month, year);
+                },
+                mYear,
+                (mMonth - 1),
+                mDay);
+        datePickerDialog.getDatePicker().setMinDate(zdt.toInstant().toEpochMilli());
+        datePickerDialog.show();
+    }
+
+    /**
+     * Method to init the time picker
+     * & update the ViewState with time selected by user
+     */
+    private void configureTimePicker() {
+        int hour = zdt.getHour();
+        int minute = zdt.getMinute();
+
+        //set time picker dialog
+        TimePickerDialog.OnTimeSetListener timePickerListener = (timePicker, selectedHour, selectedMinute) ->
+                createMeetingViewModel.onTimeChanged(selectedHour,selectedMinute);
+        int style = AlertDialog.THEME_HOLO_LIGHT;
+        TimePickerDialog timePickerDialog = new TimePickerDialog(this, style, timePickerListener, hour, minute, true);
+        timePickerDialog.setTitle(R.string.time_picker_text);
+        timePickerDialog.show();
+    }
+
+    /**
+     * Update the viewState with subject written by user
+     */
+    private void getSubjectWritten(){
+        createMeetingViewModel.onSubjectChanged(binding.subject.toString());
+    }
+
+    /**
+     * Check if email written by user is correct, if it's not send a error message
+     * & passing input to configureParticipantChip() method
+     */
+    private void displayParticipantEmail() {
+        TextInputEditText emailInput = binding.participantsTextInput;
+        binding.addEmailParticipant.setOnClickListener(v -> {
+            if(createMeetingViewModel.isEmailValid(emailInput.getEditableText().toString())){
+                configureParticipantChip(emailInput);
+                emailInput.setText("");
+            }else{
+                if(!emailInput.toString().isEmpty()){
+                binding.participantsLyt.setError(getString(R.string.error_email));
+                }
+            }
+        });
+    }
+
+    /**
+     * Configuration UI for a chip considering the input
+     * Called only  if email's pattern is correct
+     * @param participantsTextInput
+     */
+    private void configureParticipantChip(@NonNull TextInputEditText participantsTextInput) {
+        Chip chip = new Chip(this);
+        chip.setText(Objects.requireNonNull(participantsTextInput.getText()).toString());
+        chip.setChipIconResource(R.drawable.ic_person_black);
+        chip.setCloseIconVisible(true);
+        chip.setOnCloseIconClickListener(v -> {
+            binding.chipGroup.removeView(chip);
+            emailsParticipants.remove(chip.getText().toString());
+        });
+        binding.chipGroup.addView(chip);
+        emailsParticipants.add(chip.getText().toString());
+    }
+
+    /**
+     * Method to create a meeting with input completed by user
+     */
+    private void createTheMeeting() {
+        createMeetingViewModel.createMeeting(
+                Objects.requireNonNull(binding.datepicker.getText()).toString(),
+                Objects.requireNonNull(binding.timepicker.getText()).toString(),
+                selectedRoom,
+                Objects.requireNonNull(binding.subject.getText()).toString(),
+                emailsParticipants
+        );
     }
 
 }

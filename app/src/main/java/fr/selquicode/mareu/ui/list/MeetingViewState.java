@@ -95,7 +95,7 @@ public class MeetingViewState {
 
     @Override
     public String toString() {
-        return "MeetingsViewState{" +
+        return "MeetingViewState{" +
                 "id=" + id +
                 ", date='" + date + '\'' +
                 ", hour='" + hour + '\'' +
@@ -105,6 +105,4 @@ public class MeetingViewState {
                 ", colorRoom=" + colorRoom +
                 '}';
     }
-
-
 }

@@ -2,11 +2,12 @@ package fr.selquicode.mareu;
 
 import static org.junit.Assert.assertEquals;
 
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
 
-import org.hamcrest.MatcherAssert;
+import com.google.common.truth.Truth;
+
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -47,26 +48,70 @@ public class MeetingRepositoryTest {
 
     private MeetingRepository repository;
 
+    @Rule
+    public InstantTaskExecutorRule instantTaskExecutorRule = new InstantTaskExecutorRule();
 
     @Before
     public void setup(){
         meetings.add(firstMeeting);
         meetings.add(secondMeeting);
-        repository = new MeetingRepository();
+        repository = new MeetingRepository(meetings);
     }
 
     @Test
     public void getAllMeetings_typeLiveData_WithSuccess() throws InterruptedException {
-        //should return LiveData<List<Meeting>>
-        List<Meeting> meetingsListExpected = LiveDataTestUtils.getOrAwaitValue(repository.getMeetingsLiveData());
-        assertEquals(meetingsListExpected, meetings);
+        // WHEN
+        List<Meeting> actualMeetingsList = LiveDataTestUtils.getOrAwaitValue(repository.getMeetingsLiveData());
+
+        //THEN
+        Truth.assertThat(actualMeetingsList).containsExactlyElementsIn(meetings);
     }
 
     @Test
-    public void deleteMeetingMeetingWithSuccess(){}
+    public void deleteMeetingWithSuccess() throws InterruptedException {
+        //GIVEN
+        List<Meeting> actualMeetingsList = LiveDataTestUtils.getOrAwaitValue(repository.getMeetingsLiveData());
+
+        //WHEN
+        repository.deleteMeeting(1);
+
+        //THEN
+        Truth.assertThat(actualMeetingsList).doesNotContain(firstMeeting);
+        assertEquals(1, actualMeetingsList.size());
+    }
 
     @Test
-    public void createMeetingWithSuccess(){}
+    public void createMeetingWithSuccess() throws InterruptedException {
+        // GIVEN
+        List<Meeting> actualMeetingsList = LiveDataTestUtils.getOrAwaitValue(repository.getMeetingsLiveData());
+        Meeting createdMeeting = new Meeting(
+                3,
+                LocalDate.of(2023,6, 12),
+                LocalTime.of(8,0),
+                Room.ROOM3,
+                "subject 3",
+                Arrays.asList("a@lamzone.fr", "b@lamzone.fr")
+        );
 
+        //WHEN
+        repository.createMeeting(createdMeeting);
+
+        //THEN
+        Truth.assertThat(actualMeetingsList).contains(createdMeeting);
+        assertEquals(3, actualMeetingsList.size());
+    }
+
+    @Test
+    public void generateId_byIncrement_shouldNeverBeUnder_Four(){
+        long id = repository.generateId();
+        Truth.assertThat(5).isEqualTo(id);
+
+        long idIncrement = repository.generateId();
+        Truth.assertThat(6).isEqualTo(idIncrement);
+
+        long idIncrementAgain = repository.generateId();
+        Truth.assertThat(7).isEqualTo(idIncrementAgain);
+
+    }
 
 }

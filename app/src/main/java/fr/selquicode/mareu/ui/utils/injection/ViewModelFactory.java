@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModelProvider;
 import java.util.ArrayList;
 import java.util.List;
 
+import fr.selquicode.mareu.data.SuperMeetingGenerator;
 import fr.selquicode.mareu.data.model.Meeting;
 import fr.selquicode.mareu.data.repository.MeetingRepository;
 import fr.selquicode.mareu.ui.create.CreateMeetingViewModel;
@@ -28,7 +29,7 @@ public class ViewModelFactory implements ViewModelProvider.Factory {
         if(factory == null){
             synchronized (ViewModelFactory.class){
                 if(factory == null){
-                    factory = new ViewModelFactory(new MeetingRepository());
+                    factory = new ViewModelFactory(new MeetingRepository(SuperMeetingGenerator.SUPER_MEETINGS));
                 }
             }
         }
