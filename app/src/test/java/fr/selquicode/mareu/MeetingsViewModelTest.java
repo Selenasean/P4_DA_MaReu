@@ -119,21 +119,17 @@ public class MeetingsViewModelTest {
         List<MeetingViewState> meetingViewStateFilteredByDate = LiveDataTestUtils.getOrAwaitValue(viewModel.getMeetings());
 
         //THEN
-        //Truth.assertThat(1).isEqualTo(meetingViewStateFilteredByDate.size());
         Truth.assertThat(meetingViewStateFilteredByDate).containsExactly(meetingsViewState.get(1));
-        Truth.assertThat(meetingViewStateFilteredByDate).doesNotContain(meetingsViewState.get(0));
     }
 
     @Test
     public void should_return_ListFilteredByRoom() throws InterruptedException {
-
         //WHEN
         viewModel.filterByRoom("Salle B");
         List<MeetingViewState> meetingViewStateFilteredByRoom = LiveDataTestUtils.getOrAwaitValue(viewModel.getMeetings());
 
         //THEN
         Truth.assertThat(meetingViewStateFilteredByRoom).containsExactly(meetingsViewState.get(1));
-        Truth.assertThat(meetingViewStateFilteredByRoom).doesNotContain(meetingsViewState.get(0));
     }
 
     @Test
@@ -145,7 +141,6 @@ public class MeetingsViewModelTest {
 
         //THEN
         Truth.assertThat(meetingViewStateListFiltered).containsExactly(meetingsViewState.get(2));
-        Truth.assertThat(meetingViewStateListFiltered).doesNotContain(Arrays.asList(meetingsViewState.get(0), meetingsViewState.get(1)));
     }
 
     @Test
@@ -160,6 +155,6 @@ public class MeetingsViewModelTest {
         List<MeetingViewState> resetList = LiveDataTestUtils.getOrAwaitValue(viewModel.getMeetings());
 
         //THEN
-        Truth.assertThat(3).isEqualTo(resetList.size());
+        Truth.assertThat(resetList).hasSize(3);
     }
 }

@@ -5,9 +5,12 @@ import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
+
 import android.content.Intent;
 import android.os.Bundle;
 
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.widget.ArrayAdapter;
 
 
@@ -18,17 +21,13 @@ import androidx.lifecycle.ViewModelProvider;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.textfield.TextInputEditText;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
 
 import fr.selquicode.mareu.R;
-import fr.selquicode.mareu.data.model.Meeting;
 import fr.selquicode.mareu.data.model.Room;
 import fr.selquicode.mareu.databinding.ActivityCreateBinding;
 import fr.selquicode.mareu.ui.utils.injection.ViewModelFactory;
@@ -40,14 +39,10 @@ public class CreateMeetingActivity extends AppCompatActivity {
 
     public ZoneId z = ZoneId.of("Europe/Paris");
     public ZonedDateTime zdt = ZonedDateTime.now(z);
-    @NonNull
-    private String selectedRoom = "";
-    @NonNull
-    private List<String> emailsParticipants = new ArrayList<>();
 
     /**
      * To navigate from mainActivity to here
-     * @param context : of the actual activity
+     * @param context : of the meetingActivity, where navigate() is called
      * @return Intent
      */
     @NonNull
@@ -61,7 +56,7 @@ public class CreateMeetingActivity extends AppCompatActivity {
         binding = ActivityCreateBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        //settings ViewModel & Observer
+        // settings ViewModel & Observers
         setViewModel();
 
         // settings for Date & Time Pickers
@@ -72,55 +67,60 @@ public class CreateMeetingActivity extends AppCompatActivity {
 
         // settings for room selection
         configureRoomChoice();
-        getRoomSelected();
+        setRoomSelected();
 
-        //update subject
-        getSubjectWritten();
+        // setting for the subject
+        setSubjectWritten();
 
-        // settings for participants' list
+        // settings for participants' list emails
         displayParticipantEmail();
 
-        //create meeting button
+        // create meeting button
         binding.btnCreate.setEnabled(false);
-        binding.btnCreate.setOnClickListener(v -> createTheMeeting());
+        binding.btnCreate.setOnClickListener(v -> onCreateMeetingClicked());
     }
 
     /**
-     * Settings for viewModel & Observer for the UI
+     * Settings for viewModel & Observers for the UI
      */
     private void setViewModel() {
         createMeetingViewModel = new ViewModelProvider(this, ViewModelFactory.getInstance()).get(CreateMeetingViewModel.class);
         createMeetingViewModel.getCreatedMeetingLiveData().observe(this, this::render);
 
-        // observer for closing activity when createTheMeeting is called
+        // observer for closing activity when onCreatedMeetingClicked() is called
         createMeetingViewModel.getCloseActivity().observe(this, closeActivitySingleLiveEvent -> finish());
     }
 
     /**
      * Render method to display the correct info regarding the state of the UI
-     * @param state
+     * @param state the CreateViewState
      */
     private void render(@NonNull CreateMeetingViewState state) {
         //refresh UI
         if(!binding.chooseRoomTextV.getText().toString().equals(state.getRoomName())){
             binding.chooseRoomTextV.setText(state.getRoomName());
         }
-        if(!Objects.requireNonNull(binding.datepicker.getText()).toString().equals(state.getDate())){
+        if(Objects.requireNonNull(binding.datepicker.getText()).toString().equals(state.getDate())){
             binding.datepicker.setText(state.getDate());
         }
         if(!Objects.requireNonNull(binding.timepicker.getText()).toString().equals(state.getHour())){
             binding.timepicker.setText(state.getHour());
         }
-        if(!Objects.requireNonNull(binding.subject.getText()).toString().equals(state.getSubject())){
+        if(Objects.requireNonNull(binding.subject.getText()).toString().equals(state.getSubject())){
                binding.subject.setText(state.getSubject());
         }
+        // erase all chips so the UI displays only what the viewState have in memory
+        binding.chipGroup.removeAllViews();
+        for(String member : state.getMembers()){
+            configureParticipantChip(member);
+        }
 
-        //enabled create btn
+        //enabled create btn when all the inputs are completed
         binding.btnCreate.setEnabled(state.isCreatedEnabled());
     }
 
     /**
-     * method to init the room picker EditText
+     * method to init the room picker
      */
     private void configureRoomChoice() {
         List<String> roomList = new ArrayList<>();
@@ -133,12 +133,12 @@ public class CreateMeetingActivity extends AppCompatActivity {
     }
 
     /**
-     * Method to save in variable the room selected and update te ViewState
+     * Method who called CreateViewModel by giving him the room selected by user
+     * So the ViewModel can update the ViewState with new value
      */
-    private void getRoomSelected() {
+    private void setRoomSelected() {
         binding.chooseRoomTextV.setOnItemClickListener((adapterView, v, position, id) ->
-                selectedRoom = adapterView.getItemAtPosition(position).toString());
-        createMeetingViewModel.onRoomChanged(selectedRoom);
+                createMeetingViewModel.onRoomChanged(adapterView.getItemAtPosition(position).toString()));
     }
 
     /**
@@ -154,9 +154,7 @@ public class CreateMeetingActivity extends AppCompatActivity {
         int style = AlertDialog.THEME_HOLO_LIGHT;
         DatePickerDialog datePickerDialog = new DatePickerDialog(this,
                 style,
-                (view, year, month, dayOfMonth) -> {
-                    createMeetingViewModel.onDateChanged(dayOfMonth, month, year);
-                },
+                (view, year, month, dayOfMonth) -> createMeetingViewModel.onDateChanged(dayOfMonth, month, year),
                 mYear,
                 (mMonth - 1),
                 mDay);
@@ -175,28 +173,45 @@ public class CreateMeetingActivity extends AppCompatActivity {
         //set time picker dialog
         TimePickerDialog.OnTimeSetListener timePickerListener = (timePicker, selectedHour, selectedMinute) ->
                 createMeetingViewModel.onTimeChanged(selectedHour,selectedMinute);
-        int style = AlertDialog.THEME_HOLO_LIGHT;
-        TimePickerDialog timePickerDialog = new TimePickerDialog(this, style, timePickerListener, hour, minute, true);
+        TimePickerDialog timePickerDialog = new TimePickerDialog(this, timePickerListener, hour, minute, true);
         timePickerDialog.setTitle(R.string.time_picker_text);
         timePickerDialog.show();
     }
 
     /**
-     * Update the viewState with subject written by user
+     * Method that call ViewModel by giving him the new value of the subject's input
+     * Thereby the viewSate can be update
      */
-    private void getSubjectWritten(){
-        createMeetingViewModel.onSubjectChanged(binding.subject.toString());
+    private void setSubjectWritten(){
+        binding.subject.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    createMeetingViewModel.onSubjectChanged(s.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+
     }
 
     /**
      * Check if email written by user is correct, if it's not send a error message
-     * & passing input to configureParticipantChip() method
+     * If it fits, called the ViewModel and giving him the new email's value
+     * So the ViewState can be update
      */
     private void displayParticipantEmail() {
         TextInputEditText emailInput = binding.participantsTextInput;
         binding.addEmailParticipant.setOnClickListener(v -> {
             if(createMeetingViewModel.isEmailValid(emailInput.getEditableText().toString())){
-                configureParticipantChip(emailInput);
+                createMeetingViewModel.onEmailAdded(emailInput.getEditableText().toString());
                 emailInput.setText("");
             }else{
                 if(!emailInput.toString().isEmpty()){
@@ -208,33 +223,21 @@ public class CreateMeetingActivity extends AppCompatActivity {
 
     /**
      * Configuration UI for a chip considering the input
-     * Called only  if email's pattern is correct
-     * @param participantsTextInput
      */
-    private void configureParticipantChip(@NonNull TextInputEditText participantsTextInput) {
+    private void configureParticipantChip(String email) {
         Chip chip = new Chip(this);
-        chip.setText(Objects.requireNonNull(participantsTextInput.getText()).toString());
+        chip.setText(email);
         chip.setChipIconResource(R.drawable.ic_person_black);
         chip.setCloseIconVisible(true);
-        chip.setOnCloseIconClickListener(v -> {
-            binding.chipGroup.removeView(chip);
-            emailsParticipants.remove(chip.getText().toString());
-        });
+        chip.setOnCloseIconClickListener(v -> createMeetingViewModel.onEmailRemoved(email));
         binding.chipGroup.addView(chip);
-        emailsParticipants.add(chip.getText().toString());
     }
 
     /**
-     * Method to create a meeting with input completed by user
+     * Method to create a meeting
      */
-    private void createTheMeeting() {
-        createMeetingViewModel.createMeeting(
-                Objects.requireNonNull(binding.datepicker.getText()).toString(),
-                Objects.requireNonNull(binding.timepicker.getText()).toString(),
-                selectedRoom,
-                Objects.requireNonNull(binding.subject.getText()).toString(),
-                emailsParticipants
-        );
+    private void onCreateMeetingClicked() {
+        createMeetingViewModel.createMeeting();
     }
 
 }

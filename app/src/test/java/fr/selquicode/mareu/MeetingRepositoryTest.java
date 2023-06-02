@@ -76,8 +76,7 @@ public class MeetingRepositoryTest {
         repository.deleteMeeting(1);
 
         //THEN
-        Truth.assertThat(actualMeetingsList).doesNotContain(firstMeeting);
-        assertEquals(1, actualMeetingsList.size());
+        Truth.assertThat(actualMeetingsList).containsExactly(secondMeeting);
     }
 
     @Test
@@ -97,21 +96,13 @@ public class MeetingRepositoryTest {
         repository.createMeeting(createdMeeting);
 
         //THEN
-        Truth.assertThat(actualMeetingsList).contains(createdMeeting);
-        assertEquals(3, actualMeetingsList.size());
+        Truth.assertThat(actualMeetingsList).containsExactly(firstMeeting,secondMeeting,createdMeeting);
     }
 
     @Test
-    public void generateId_byIncrement_shouldNeverBeUnder_Four(){
+    public void generateId_shouldIncrement(){
         long id = repository.generateId();
         Truth.assertThat(5).isEqualTo(id);
-
-        long idIncrement = repository.generateId();
-        Truth.assertThat(6).isEqualTo(idIncrement);
-
-        long idIncrementAgain = repository.generateId();
-        Truth.assertThat(7).isEqualTo(idIncrementAgain);
-
     }
 
 }

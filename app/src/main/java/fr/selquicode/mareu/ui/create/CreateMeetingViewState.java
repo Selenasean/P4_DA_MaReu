@@ -1,5 +1,7 @@
 package fr.selquicode.mareu.ui.create;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -16,7 +18,7 @@ public class CreateMeetingViewState {
     private String roomName, subject;
 
 
-    @Nullable
+    @NonNull
     private List<String> members;
 
     @NonNull
@@ -34,7 +36,7 @@ public class CreateMeetingViewState {
                                   @NonNull String date,
                                   @NonNull String hour,
                                   @Nullable String subject,
-                                  @Nullable List<String> members){
+                                  @NonNull List<String> members){
         this.roomName = roomName;
         this.date = date;
         this.hour = hour;
@@ -47,7 +49,7 @@ public class CreateMeetingViewState {
      * @return boolean
      */
     public Boolean isCreatedEnabled(){
-        if(roomName != null && subject != null && members != null){
+        if(roomName != null && subject != null){
             if(roomName.isEmpty()
                     || date.isEmpty()
                     || hour.isEmpty()
@@ -65,8 +67,7 @@ public class CreateMeetingViewState {
         return subject;
     }
 
-
-    @Nullable
+    @NonNull
     public List<String> getMembers() {
         return members;
     }
@@ -74,10 +75,6 @@ public class CreateMeetingViewState {
     @NonNull
     public String getDate() {
         return date;
-    }
-
-    public void setDate(@NonNull String date) {
-        this.date = date;
     }
 
     @NonNull

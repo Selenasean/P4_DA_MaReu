@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.DatePickerDialog;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -47,7 +48,7 @@ public class MeetingsActivity extends AppCompatActivity implements OnMeetingClic
     }
 
     private void initFab() {
-        binding.fabToCreate.setOnClickListener(view -> startActivity(CreateMeetingActivity.navigate(MeetingsActivity.this)));
+        binding.fabToCreate.setOnClickListener(view -> startActivity(CreateMeetingActivity.navigate(this)));
     }
 
     /**

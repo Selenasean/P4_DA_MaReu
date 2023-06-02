@@ -55,9 +55,10 @@ public class MeetingRepository {
     /**
      * To generate an id for a created meeting
      */
-    long lowestMeetingId = 5;
+    private long lowestMeetingId = 4;
     public long generateId(){
-        return (lowestMeetingId++);
+           lowestMeetingId++;
+        return lowestMeetingId;
     }
 
 }
