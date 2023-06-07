@@ -1,9 +1,9 @@
 package fr.selquicode.mareu;
 
-import static org.junit.Assert.assertTrue;
+
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
-import androidx.lifecycle.MutableLiveData;
+
 
 import com.google.common.truth.Truth;
 

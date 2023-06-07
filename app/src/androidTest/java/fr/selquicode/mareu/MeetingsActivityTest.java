@@ -1,26 +1,48 @@
 package fr.selquicode.mareu;
 
 import static androidx.test.espresso.Espresso.onView;
+import static androidx.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu;
 import static androidx.test.espresso.action.ViewActions.click;
+import static androidx.test.espresso.action.ViewActions.doubleClick;
+import static androidx.test.espresso.action.ViewActions.scrollTo;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static androidx.test.espresso.contrib.RecyclerViewActions.actionOnItemAtPosition;
+import static androidx.test.espresso.contrib.RecyclerViewActions.scrollToPosition;
 import static androidx.test.espresso.intent.Intents.intended;
 import static androidx.test.espresso.intent.matcher.IntentMatchers.hasComponent;
 import static androidx.test.espresso.matcher.ViewMatchers.hasChildCount;
+import static androidx.test.espresso.matcher.ViewMatchers.hasDescendant;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static androidx.test.espresso.matcher.ViewMatchers.withClassName;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
+import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
 
+import static org.hamcrest.Matchers.equalTo;
+import static fr.selquicode.mareu.utils.RecyclerViewItemCountAssertion.withItemCount;
+import static fr.selquicode.mareu.utils.RecyclerViewUtils.withRecyclerView;
+
+
+
+import android.widget.DatePicker;
+
+import androidx.test.core.app.ApplicationProvider;
+import androidx.test.espresso.contrib.PickerActions;
 import androidx.test.espresso.contrib.RecyclerViewActions;
+import androidx.test.espresso.intent.Intents;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+
 import fr.selquicode.mareu.ui.create.CreateMeetingActivity;
 import fr.selquicode.mareu.ui.list.MeetingsActivity;
 import fr.selquicode.mareu.utils.DeleteViewAction;
+
 
 /**
  * Instrumented test for MeetingsActivity UI
@@ -34,6 +56,11 @@ public class MeetingsActivityTest {
     public ActivityScenarioRule<MeetingsActivity> mActivityActivityScenarioRule =
             new ActivityScenarioRule<>(MeetingsActivity.class);
 
+    @Before
+    public void setup(){
+        Intents.init();
+    }
+
     @Test
     public void recycleView_shouldBeVisible(){
         onView(withId(R.id.list_meetings)).check(matches(isDisplayed()));
@@ -42,14 +69,14 @@ public class MeetingsActivityTest {
     /**FAILED
      */
     @Test
-    public void meeting_shouldBeDeleted_andDisappear_whenClicked(){
+    public void onCLicked_deleteButton_shouldDeleteTheMeeting(){
         //GIVEN
         onView(withId(R.id.list_meetings)).check(matches(hasChildCount(MEETINGS_LIST_COUNT)));
         // WHEN perform a click from delete button on an item from the RecycleView list
         onView(withId(R.id.list_meetings))
                 .perform(RecyclerViewActions.actionOnItemAtPosition(0, new DeleteViewAction()));
         //THEN
-        onView(withId(R.id.list_meetings)).check(matches(hasChildCount(MEETINGS_LIST_COUNT - 1)));
+        onView(withId(R.id.list_meetings)).check(withItemCount(MEETINGS_LIST_COUNT -1));
     }
 
     @Test
@@ -61,14 +88,72 @@ public class MeetingsActivityTest {
     }
 
     @Test
-    public void onClicked_filterByRoom_shouldFilterByRoom(){}
+    public void onClicked_filterByRoom_shouldFilterByRoom(){
+        //WHEN
+        openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext());
+        onView(withText(R.string.filter_room)).perform(click());
+        onView(withText("Salle A")).perform(click());
+
+        //THEN
+       onView(withId(R.id.list_meetings)).check(withItemCount(1));
+       //Verifiez que l'item contient "Salle A"
+    }
 
     @Test
-    public void onCLicked_filterByDate_shouldFilterByDate(){}
+    public void onCLicked_filterByDate_shouldFilterByDate(){
+        //WHEN
+        openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext());
+        onView(withText(R.string.filter_date)).perform(click());
+        onView(withClassName(equalTo(DatePicker.class.getName())))
+                .perform(PickerActions.setDate(2023, 6, 12));
+        onView(withId(android.R.id.button1)).perform(doubleClick());
+
+        //THEN
+        onView(withId(R.id.list_meetings)).check(withItemCount(2));
+
+        //verifiez que les items contiennent la date
+    }
 
     @Test
-    public void onClicked_filterByDate_andFilterByRoom_shouldFilterByDateThenByRoom(){}
+    public void onClicked_filterByDate_andFilterByRoom_shouldFilterByDateThenByRoom(){
+        //WHEN
+        // filter by date
+        openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext());
+        onView(withText(R.string.filter_date)).perform(click());
+        onView(withClassName(equalTo(DatePicker.class.getName())))
+                .perform(PickerActions.setDate(2023, 6, 12));
+        onView(withId(android.R.id.button1)).perform(doubleClick());
+
+        //filter by room
+        openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext());
+        onView(withText(R.string.filter_room)).perform(click());
+        onView(withText("Salle C")).perform(click());
+
+        //THEN
+        onView(withId(R.id.list_meetings)).check(withItemCount(1));
+//        onView(withRecyclerView(R.id.list_meetings)).atPositionOnView(0,R.id.date_meeting).check(matches(withText("12/06/2023")));
+
+        //verifiez que l'item contient la date et la bonne salle
+    }
 
     @Test
-    public void onClicked_reset_shouldResetAllFilters(){}
+    public void onClicked_reset_shouldResetAllFilters(){
+        //WHEN
+        // filter by date
+        openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext());
+        onView(withText(R.string.filter_date)).perform(click());
+        onView(withClassName(equalTo(DatePicker.class.getName())))
+                .perform(PickerActions.setDate(2023, 6, 12));
+        onView(withId(android.R.id.button1)).perform(doubleClick());
+        // filter by place
+        openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext());
+        onView(withText(R.string.filter_room)).perform(click());
+        onView(withText("Salle C")).perform(click());
+        // reset
+        openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext());
+        onView(withText(R.string.filter_return)).perform(click());
+
+        //THEN
+        onView(withId(R.id.list_meetings)).check(withItemCount(MEETINGS_LIST_COUNT));
+    }
 }

@@ -97,18 +97,13 @@ public class CreateMeetingActivity extends AppCompatActivity {
      */
     private void render(@NonNull CreateMeetingViewState state) {
         //refresh UI
-        if(!binding.chooseRoomTextV.getText().toString().equals(state.getRoomName())){
-            binding.chooseRoomTextV.setText(state.getRoomName());
-        }
-        if(Objects.requireNonNull(binding.datepicker.getText()).toString().equals(state.getDate())){
-            binding.datepicker.setText(state.getDate());
-        }
-        if(!Objects.requireNonNull(binding.timepicker.getText()).toString().equals(state.getHour())){
-            binding.timepicker.setText(state.getHour());
-        }
-        if(Objects.requireNonNull(binding.subject.getText()).toString().equals(state.getSubject())){
+        binding.chooseRoomTextV.setText(state.getRoomName());
+        binding.datepicker.setText(state.getDate());
+        binding.timepicker.setText(state.getHour());
+        if(!Objects.requireNonNull(binding.subject.getText()).toString().equals(state.getSubject())){
                binding.subject.setText(state.getSubject());
         }
+
         // erase all chips so the UI displays only what the viewState have in memory
         binding.chipGroup.removeAllViews();
         for(String member : state.getMembers()){
@@ -151,9 +146,8 @@ public class CreateMeetingActivity extends AppCompatActivity {
         int mYear = zdt.getYear();
 
         // set date picker dialog
-        int style = AlertDialog.THEME_HOLO_LIGHT;
-        DatePickerDialog datePickerDialog = new DatePickerDialog(this,
-                style,
+        DatePickerDialog datePickerDialog = new DatePickerDialog(
+                this,
                 (view, year, month, dayOfMonth) -> createMeetingViewModel.onDateChanged(dayOfMonth, month, year),
                 mYear,
                 (mMonth - 1),
@@ -171,9 +165,10 @@ public class CreateMeetingActivity extends AppCompatActivity {
         int minute = zdt.getMinute();
 
         //set time picker dialog
+        int style = AlertDialog.THEME_HOLO_LIGHT;
         TimePickerDialog.OnTimeSetListener timePickerListener = (timePicker, selectedHour, selectedMinute) ->
                 createMeetingViewModel.onTimeChanged(selectedHour,selectedMinute);
-        TimePickerDialog timePickerDialog = new TimePickerDialog(this, timePickerListener, hour, minute, true);
+        TimePickerDialog timePickerDialog = new TimePickerDialog(this, style, timePickerListener, hour, minute, true);
         timePickerDialog.setTitle(R.string.time_picker_text);
         timePickerDialog.show();
     }

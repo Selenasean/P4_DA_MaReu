@@ -1,20 +1,29 @@
 package fr.selquicode.mareu.utils;
 
-import static androidx.test.espresso.matcher.ViewMatchers.assertThat;
-
-import static org.hamcrest.Matchers.is;
-
 import android.view.View;
 
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.test.espresso.NoMatchingViewException;
 import androidx.test.espresso.ViewAssertion;
 
-public class RecyclerViewItemCountAssertion implements ViewAssertion {
-    private final int expectedCount;
+import org.hamcrest.Matcher;
+import org.hamcrest.Matchers;
+import org.junit.Assert;
 
-    public RecyclerViewItemCountAssertion(int expectedCount) {
-        this.expectedCount = expectedCount;
+public class RecyclerViewItemCountAssertion implements ViewAssertion {
+
+    private final Matcher<Integer> matcher;
+
+    public static RecyclerViewItemCountAssertion withItemCount(int expectedCount) {
+        return withItemCount(Matchers.is(expectedCount));
+    }
+
+    public static RecyclerViewItemCountAssertion withItemCount(Matcher<Integer> matcher) {
+        return new RecyclerViewItemCountAssertion(matcher);
+    }
+
+    private RecyclerViewItemCountAssertion(Matcher<Integer> matcher) {
+        this.matcher = matcher;
     }
 
     @Override
@@ -24,8 +33,9 @@ public class RecyclerViewItemCountAssertion implements ViewAssertion {
         }
 
         RecyclerView recyclerView = (RecyclerView) view;
-        if (recyclerView.getAdapter() != null) {
-            assertThat(recyclerView.getAdapter().getItemCount(), is(expectedCount));
-        }
+        RecyclerView.Adapter adapter = recyclerView.getAdapter();
+        assert adapter != null;
+        Assert.assertThat(adapter.getItemCount(), matcher);
+
     }
 }

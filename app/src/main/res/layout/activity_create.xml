@@ -177,6 +177,7 @@
 
         </com.google.android.material.textfield.TextInputLayout>
 
+        <!-- Button to add an Email -->
         <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/add_email_participant"
             android:layout_width="48dp"
@@ -190,6 +191,7 @@
             app:layout_constraintTop_toTopOf="@id/participants_lyt"
             app:layout_constraintEnd_toEndOf="parent" />
 
+        <!-- ChipGroup -->
         <com.google.android.material.chip.ChipGroup
             android:id="@+id/chip_group"
             android:layout_width="match_parent"
