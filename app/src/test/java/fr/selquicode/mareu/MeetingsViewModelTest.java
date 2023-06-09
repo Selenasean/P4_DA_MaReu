@@ -16,7 +16,6 @@ import org.mockito.Mockito;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -35,7 +34,7 @@ public class MeetingsViewModelTest {
 
     private final MeetingRepository repository = Mockito.mock(MeetingRepository.class);
     private MeetingsViewModel viewModel;
-    private List<Meeting> meetings;
+    private List<Meeting> mMeetings;
     private List<MeetingViewState> meetingsViewState;
 
     @Rule
@@ -43,10 +42,10 @@ public class MeetingsViewModelTest {
 
     @Before
     public void setup() {
-        meetings = Arrays.asList(
+        mMeetings = Arrays.asList(
                 new Meeting(
                         1,
-                        LocalDate.of(2023, 06, 12),
+                        LocalDate.of(2023, 6, 12),
                         LocalTime.of(10, 0),
                         Room.ROOM1,
                         "voila",
@@ -54,7 +53,7 @@ public class MeetingsViewModelTest {
                 ),
                 new Meeting(
                         2,
-                        LocalDate.of(2023, 06, 10),
+                        LocalDate.of(2023, 6, 10),
                         LocalTime.of(8, 0),
                         Room.ROOM2,
                         "voili",
@@ -69,7 +68,7 @@ public class MeetingsViewModelTest {
                         Arrays.asList("a@lamzone.fr", "b@lamzone.fr")
                 )
         );
-        LiveData<List<Meeting>> meetingsListLD = new MutableLiveData<>(meetings);
+        LiveData<List<Meeting>> meetingsListLD = new MutableLiveData<>(mMeetings);
 
         Mockito.when(repository.getMeetingsLiveData()).thenReturn(meetingsListLD);
         viewModel = new MeetingsViewModel(repository);

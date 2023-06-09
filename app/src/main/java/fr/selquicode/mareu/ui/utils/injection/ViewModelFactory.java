@@ -4,12 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
-
-import java.util.ArrayList;
-import java.util.List;
-
 import fr.selquicode.mareu.data.SuperMeetingGenerator;
-import fr.selquicode.mareu.data.model.Meeting;
 import fr.selquicode.mareu.data.repository.MeetingRepository;
 import fr.selquicode.mareu.ui.create.CreateMeetingViewModel;
 import fr.selquicode.mareu.ui.list.MeetingsViewModel;
@@ -23,12 +18,13 @@ public class ViewModelFactory implements ViewModelProvider.Factory {
 
     /**
      * Get an instance of ViewModelFactory
+     *
      * @return factory which is a ViewModelFactory
      */
-    public static ViewModelFactory getInstance(){
-        if(factory == null){
-            synchronized (ViewModelFactory.class){
-                if(factory == null){
+    public static ViewModelFactory getInstance() {
+        if (factory == null) {
+            synchronized (ViewModelFactory.class) {
+                if (factory == null) {
                     factory = new ViewModelFactory(new MeetingRepository(SuperMeetingGenerator.SUPER_MEETINGS));
                 }
             }
@@ -42,25 +38,25 @@ public class ViewModelFactory implements ViewModelProvider.Factory {
     /**
      * Constructor
      */
-    private ViewModelFactory(@NonNull MeetingRepository meetingRepository){
+    private ViewModelFactory(@NonNull MeetingRepository meetingRepository) {
         this.meetingRepository = meetingRepository;
     }
 
     /**
      * Creation of viewModels
-     * @param modelClass
+     *
+     * @param modelClass model of classes ViewModel
+     * @param <T>        type of Class, here of ViewModel
      * @return new viewModel
-     * @param <T>
      */
     @NonNull
     @Override
-    public <T extends ViewModel> T create(Class<T> modelClass){
+    public <T extends ViewModel> T create(Class<T> modelClass) {
         // if modelClass - model of classes ViewModel - is the same as new ViewModel created = MeetingsViewModel
-        if(modelClass.isAssignableFrom(MeetingsViewModel.class)){
+        if (modelClass.isAssignableFrom(MeetingsViewModel.class)) {
             return (T) new MeetingsViewModel(meetingRepository);
-        }
-        else if(modelClass.isAssignableFrom(CreateMeetingViewModel.class)){
-            return (T) new  CreateMeetingViewModel(meetingRepository);
+        } else if (modelClass.isAssignableFrom(CreateMeetingViewModel.class)) {
+            return (T) new CreateMeetingViewModel(meetingRepository);
         }
         throw new IllegalArgumentException("Unknown ViewModel class");
     }

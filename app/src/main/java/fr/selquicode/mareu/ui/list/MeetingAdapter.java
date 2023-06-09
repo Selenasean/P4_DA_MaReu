@@ -54,13 +54,7 @@ public class MeetingAdapter extends ListAdapter<MeetingViewState, MeetingAdapter
             hour.setText(item.getHour());
             members.setText(item.getMeetingMembers());
 
-            deleteImg.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    listener.onDeleteMeetingClicked(item.getId());
-
-                }
-            });
+            deleteImg.setOnClickListener(v -> listener.onDeleteMeetingClicked(item.getId()));
         }
     }
 

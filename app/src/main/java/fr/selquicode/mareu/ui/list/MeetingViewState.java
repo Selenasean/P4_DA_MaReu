@@ -15,7 +15,7 @@ public class MeetingViewState {
     private final long id;
 
     @NonNull
-    private final String date, hour, roomName,subject, meetingMembers;
+    private final String date, hour, roomName, subject, meetingMembers;
 
     @NonNull
     private final int colorRoom;
@@ -23,12 +23,14 @@ public class MeetingViewState {
 
     /**
      * Constructor
-     * @param id
-     * @param date
-     * @param hour
-     * @param roomName
-     * @param subject
-     * @param meetingMembers
+     *
+     * @param id             type long
+     * @param date           type String
+     * @param hour           type String
+     * @param roomName       type String
+     * @param subject        type String
+     * @param meetingMembers type String
+     * @param colorRoom      type int, from the Room
      */
     public MeetingViewState(long id,
                             @NonNull String date,

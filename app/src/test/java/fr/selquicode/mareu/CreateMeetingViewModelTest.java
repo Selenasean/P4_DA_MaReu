@@ -1,7 +1,6 @@
 package fr.selquicode.mareu;
 
 
-
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
 
 
@@ -17,9 +16,8 @@ import org.mockito.Mockito;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.Collections;
+
 
 import fr.selquicode.mareu.data.model.Meeting;
 import fr.selquicode.mareu.data.model.Room;
@@ -44,12 +42,12 @@ public class CreateMeetingViewModelTest {
     public InstantTaskExecutorRule instantTaskExecutorRule = new InstantTaskExecutorRule();
 
     @Before
-    public void setup(){
+    public void setup() {
         viewModel = new CreateMeetingViewModel(repository);
     }
 
     @Test
-    public void parseToRoomWithSuccess(){
+    public void parseToRoomWithSuccess() {
         //WHEN
         Room roomSelected = viewModel.parseToRoom("SalleA");
         //THEN
@@ -57,26 +55,26 @@ public class CreateMeetingViewModelTest {
     }
 
     @Test
-    public void parseToLocalDateWithSuccess(){
+    public void parseToLocalDateWithSuccess() {
         //WHEN
         LocalDate dateSelected = viewModel.parseToLocalDate("01/06/2023");
         //THEN
-        Truth.assertThat(dateSelected).isEqualTo(LocalDate.of(2023,6,1));
+        Truth.assertThat(dateSelected).isEqualTo(LocalDate.of(2023, 6, 1));
     }
 
     @Test
-    public void parseToLocalTimeWithSuccess(){
+    public void parseToLocalTimeWithSuccess() {
         //WHEN
         LocalTime timeSelected = viewModel.parseToLocalTime("12:50");
         //THEN
-        Truth.assertThat(timeSelected).isEqualTo(LocalTime.of(12,50));
+        Truth.assertThat(timeSelected).isEqualTo(LocalTime.of(12, 50));
     }
 
     @Test
     public void onDateChanged_shouldUpdate_viewState() throws InterruptedException {
         //WHEN
-        viewModel.onDateChanged(1,5,2023);
-        String dateExpected = dateFormatter.format(LocalDate.of(2023,6,1));
+        viewModel.onDateChanged(1, 5, 2023);
+        String dateExpected = dateFormatter.format(LocalDate.of(2023, 6, 1));
         CreateMeetingViewState meetingViewState = LiveDataTestUtils.getOrAwaitValue(viewModel.getCreatedMeetingLiveData());
         //THEN
         Truth.assertThat(meetingViewState.getDate()).isEqualTo(dateExpected);
@@ -85,8 +83,8 @@ public class CreateMeetingViewModelTest {
     @Test
     public void onTimeChanged_shouldUpdate_viewState() throws InterruptedException {
         //WHEN
-        viewModel.onTimeChanged(11,47);
-        String timeExpected = timeFormatter.format(LocalTime.of(11,47));
+        viewModel.onTimeChanged(11, 47);
+        String timeExpected = timeFormatter.format(LocalTime.of(11, 47));
         CreateMeetingViewState meetingViewState = LiveDataTestUtils.getOrAwaitValue(viewModel.getCreatedMeetingLiveData());
         //THEN
         Truth.assertThat(meetingViewState.getHour()).isEqualTo(timeExpected);
@@ -97,7 +95,7 @@ public class CreateMeetingViewModelTest {
         //WHEN
         String SUBJECT = "SUBJECT";
         viewModel.onSubjectChanged(SUBJECT);
-        CreateMeetingViewState meetingViewState =  LiveDataTestUtils.getOrAwaitValue(viewModel.getCreatedMeetingLiveData());
+        CreateMeetingViewState meetingViewState = LiveDataTestUtils.getOrAwaitValue(viewModel.getCreatedMeetingLiveData());
         //THEN
         Truth.assertThat(meetingViewState.getSubject()).isEqualTo(SUBJECT);
     }
@@ -107,7 +105,7 @@ public class CreateMeetingViewModelTest {
         //WHEN
         String ROOM_NAME = "ROOM_NAME";
         viewModel.onRoomChanged(ROOM_NAME);
-        CreateMeetingViewState meetingViewState =  LiveDataTestUtils.getOrAwaitValue(viewModel.getCreatedMeetingLiveData());
+        CreateMeetingViewState meetingViewState = LiveDataTestUtils.getOrAwaitValue(viewModel.getCreatedMeetingLiveData());
         //THEN
         Truth.assertThat(meetingViewState.getRoomName()).isEqualTo(ROOM_NAME);
     }
@@ -116,7 +114,7 @@ public class CreateMeetingViewModelTest {
     public void onEmailAdded_shouldUpdate_viewState() throws InterruptedException {
         //WHEN
         viewModel.onEmailAdded(EMAIL);
-        CreateMeetingViewState meetingViewState =  LiveDataTestUtils.getOrAwaitValue(viewModel.getCreatedMeetingLiveData());
+        CreateMeetingViewState meetingViewState = LiveDataTestUtils.getOrAwaitValue(viewModel.getCreatedMeetingLiveData());
         //THEN
         Truth.assertThat(meetingViewState.getMembers()).containsExactly(EMAIL);
     }
@@ -137,18 +135,27 @@ public class CreateMeetingViewModelTest {
 
     @Test
     public void createMeeting_canBeExecuted_becauseAllInputsAreCompleted() throws InterruptedException {
-    //GIVEN
-    viewModel.onDateChanged(1,5,2023);
-    viewModel.onTimeChanged(12,0);
-    viewModel.onRoomChanged("Salle A");
-    viewModel.onSubjectChanged("subject");
-    viewModel.onEmailAdded("email");
+        //GIVEN
+        viewModel.onDateChanged(1, 5, 2023);
+        viewModel.onTimeChanged(12, 0);
+        viewModel.onRoomChanged("Salle A");
+        viewModel.onSubjectChanged("subject");
+        viewModel.onEmailAdded("email");
 
-    //WHEN
-    viewModel.createMeeting();
-    CreateMeetingViewState meetingViewState = LiveDataTestUtils.getOrAwaitValue(viewModel.getCreatedMeetingLiveData());
-    //THEN
-    Truth.assertThat(meetingViewState.isCreatedEnabled()).isTrue();
-
+        //WHEN
+        viewModel.createMeeting();
+        CreateMeetingViewState meetingViewState = LiveDataTestUtils.getOrAwaitValue(viewModel.getCreatedMeetingLiveData());
+        //THEN
+        Truth.assertThat(meetingViewState.isCreatedEnabled()).isTrue();
+        // verify that the meeting is created
+        Mockito.when(repository.generateId()).thenReturn(5L);
+        Mockito.verify(repository).createMeeting(new Meeting(
+                repository.generateId(),
+                LocalDate.of(2023, 6, 1),
+                LocalTime.of(12, 0),
+                Room.ROOM1,
+                "subject",
+                Collections.singletonList("email")
+        ));
     }
 }

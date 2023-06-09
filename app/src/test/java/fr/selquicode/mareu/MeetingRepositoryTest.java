@@ -1,6 +1,6 @@
 package fr.selquicode.mareu;
 
-import static org.junit.Assert.assertEquals;
+
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
 

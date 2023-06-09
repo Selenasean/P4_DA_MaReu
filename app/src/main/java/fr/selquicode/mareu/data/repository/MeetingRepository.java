@@ -24,6 +24,7 @@ public class MeetingRepository {
 
     /**
      * To delete a meeting from the list
+     *
      * @param id of the meeting selected
      */
     public void deleteMeeting(long id) {
@@ -42,7 +43,8 @@ public class MeetingRepository {
 
     /**
      * To create a new meeting
-     * @param meeting
+     *
+     * @param meeting to create
      */
     public void createMeeting(Meeting meeting) {
         List<Meeting> meetingsList = meetingsMutableLiveData.getValue();
@@ -56,8 +58,9 @@ public class MeetingRepository {
      * To generate an id for a created meeting
      */
     private long lowestMeetingId = 4;
-    public long generateId(){
-           lowestMeetingId++;
+
+    public long generateId() {
+        lowestMeetingId++;
         return lowestMeetingId;
     }
 

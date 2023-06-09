@@ -5,14 +5,11 @@ import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
-
 import android.content.Intent;
 import android.os.Bundle;
-
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.widget.ArrayAdapter;
-
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -42,6 +39,7 @@ public class CreateMeetingActivity extends AppCompatActivity {
 
     /**
      * To navigate from mainActivity to here
+     *
      * @param context : of the meetingActivity, where navigate() is called
      * @return Intent
      */
@@ -93,6 +91,7 @@ public class CreateMeetingActivity extends AppCompatActivity {
 
     /**
      * Render method to display the correct info regarding the state of the UI
+     *
      * @param state the CreateViewState
      */
     private void render(@NonNull CreateMeetingViewState state) {
@@ -100,13 +99,13 @@ public class CreateMeetingActivity extends AppCompatActivity {
         binding.chooseRoomTextV.setText(state.getRoomName());
         binding.datepicker.setText(state.getDate());
         binding.timepicker.setText(state.getHour());
-        if(!Objects.requireNonNull(binding.subject.getText()).toString().equals(state.getSubject())){
-               binding.subject.setText(state.getSubject());
+        if (!Objects.requireNonNull(binding.subject.getText()).toString().equals(state.getSubject())) {
+            binding.subject.setText(state.getSubject());
         }
 
         // erase all chips so the UI displays only what the viewState have in memory
         binding.chipGroup.removeAllViews();
-        for(String member : state.getMembers()){
+        for (String member : state.getMembers()) {
             configureParticipantChip(member);
         }
 
@@ -167,7 +166,7 @@ public class CreateMeetingActivity extends AppCompatActivity {
         //set time picker dialog
         int style = AlertDialog.THEME_HOLO_LIGHT;
         TimePickerDialog.OnTimeSetListener timePickerListener = (timePicker, selectedHour, selectedMinute) ->
-                createMeetingViewModel.onTimeChanged(selectedHour,selectedMinute);
+                createMeetingViewModel.onTimeChanged(selectedHour, selectedMinute);
         TimePickerDialog timePickerDialog = new TimePickerDialog(this, style, timePickerListener, hour, minute, true);
         timePickerDialog.setTitle(R.string.time_picker_text);
         timePickerDialog.show();
@@ -177,7 +176,7 @@ public class CreateMeetingActivity extends AppCompatActivity {
      * Method that call ViewModel by giving him the new value of the subject's input
      * Thereby the viewSate can be update
      */
-    private void setSubjectWritten(){
+    private void setSubjectWritten() {
         binding.subject.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -186,7 +185,7 @@ public class CreateMeetingActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                    createMeetingViewModel.onSubjectChanged(s.toString());
+                createMeetingViewModel.onSubjectChanged(s.toString());
             }
 
             @Override
@@ -205,12 +204,12 @@ public class CreateMeetingActivity extends AppCompatActivity {
     private void displayParticipantEmail() {
         TextInputEditText emailInput = binding.participantsTextInput;
         binding.addEmailParticipant.setOnClickListener(v -> {
-            if(createMeetingViewModel.isEmailValid(emailInput.getEditableText().toString())){
+            if (createMeetingViewModel.isEmailValid(emailInput.getEditableText().toString())) {
                 createMeetingViewModel.onEmailAdded(emailInput.getEditableText().toString());
                 emailInput.setText("");
-            }else{
-                if(!emailInput.toString().isEmpty()){
-                binding.participantsLyt.setError(getString(R.string.error_email));
+            } else {
+                if (!emailInput.toString().isEmpty()) {
+                    binding.participantsLyt.setError(getString(R.string.error_email));
                 }
             }
         });

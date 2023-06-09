@@ -5,14 +5,16 @@ import static androidx.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.action.ViewActions.doubleClick;
 import static androidx.test.espresso.action.ViewActions.scrollTo;
+import static androidx.test.espresso.action.ViewActions.typeText;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
-import static androidx.test.espresso.contrib.RecyclerViewActions.actionOnItemAtPosition;
-import static androidx.test.espresso.contrib.RecyclerViewActions.scrollToPosition;
+
 import static androidx.test.espresso.intent.Intents.intended;
 import static androidx.test.espresso.intent.matcher.IntentMatchers.hasComponent;
+import static androidx.test.espresso.matcher.RootMatchers.isPlatformPopup;
 import static androidx.test.espresso.matcher.ViewMatchers.hasChildCount;
-import static androidx.test.espresso.matcher.ViewMatchers.hasDescendant;
+
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
+
 import static androidx.test.espresso.matcher.ViewMatchers.withClassName;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
@@ -25,6 +27,7 @@ import static fr.selquicode.mareu.utils.RecyclerViewUtils.withRecyclerView;
 
 
 import android.widget.DatePicker;
+import android.widget.TimePicker;
 
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.espresso.contrib.PickerActions;
@@ -50,7 +53,7 @@ import fr.selquicode.mareu.utils.DeleteViewAction;
 @RunWith(AndroidJUnit4.class)
 public class MeetingsActivityTest {
 
-    private static int MEETINGS_LIST_COUNT = 4;
+    private static final int MEETINGS_LIST_COUNT = 4;
 
     @Rule
     public ActivityScenarioRule<MeetingsActivity> mActivityActivityScenarioRule =
@@ -66,8 +69,6 @@ public class MeetingsActivityTest {
         onView(withId(R.id.list_meetings)).check(matches(isDisplayed()));
     }
 
-    /**FAILED
-     */
     @Test
     public void onCLicked_deleteButton_shouldDeleteTheMeeting(){
         //GIVEN
@@ -85,6 +86,35 @@ public class MeetingsActivityTest {
         onView(withId(R.id.fab_to_create)).perform(click());
         //THEN
         intended(hasComponent(CreateMeetingActivity.class.getName()));
+    }
+
+    @Test
+    public void onClick_createMeeting_shouldCreateMeeting(){
+        onView(withId(R.id.fab_to_create)).perform(click());
+
+        onView(withId(R.id.choose_roomTextV)).perform(click());
+        onView(withText("Salle B")).inRoot(isPlatformPopup()).perform(click());
+
+        onView(withId(R.id.datepicker)).perform(click());
+        onView(withClassName(equalTo(DatePicker.class.getName())))
+                .perform(PickerActions.setDate(2023, 6, 18));
+        onView(withId(android.R.id.button1)).perform(doubleClick());
+
+        onView(withId(R.id.timepicker)).perform(click());
+        onView(withClassName(equalTo(TimePicker.class.getName())))
+                .perform(PickerActions.setTime(10, 30));
+        onView(withId(android.R.id.button1)).perform(doubleClick());
+
+        onView(withId(R.id.subject)).perform(click());
+        onView(withId(R.id.subject)).perform(typeText("sujet test"));
+
+        onView(withId(R.id.participants_textInput)).perform(click());
+        onView(withId(R.id.participants_textInput)).perform(typeText("j@lamzone.fr"));
+        onView(withId(R.id.add_email_participant)).perform(click());
+
+        //THEN
+        onView(withId(R.id.btn_create)).perform(scrollTo()).perform(click());
+        onView(withId(R.id.list_meetings)).check(withItemCount(MEETINGS_LIST_COUNT +1));
     }
 
     @Test
@@ -110,8 +140,9 @@ public class MeetingsActivityTest {
 
         //THEN
         onView(withId(R.id.list_meetings)).check(withItemCount(2));
-
-        //verifiez que les items contiennent la date
+        onView(withRecyclerView(R.id.list_meetings).atPositionOnView(0, R.id.date_meeting))
+                .check(matches(withText("12/06/2023")));
+        onView(withRecyclerView(R.id.list_meetings).atPositionOnView(1, R.id.date_meeting)).check(matches(withText("12/06/2023")));
     }
 
     @Test
@@ -131,9 +162,10 @@ public class MeetingsActivityTest {
 
         //THEN
         onView(withId(R.id.list_meetings)).check(withItemCount(1));
-//        onView(withRecyclerView(R.id.list_meetings)).atPositionOnView(0,R.id.date_meeting).check(matches(withText("12/06/2023")));
-
-        //verifiez que l'item contient la date et la bonne salle
+        onView(withRecyclerView(R.id.list_meetings).atPositionOnView(0, R.id.place_meeting))
+                .check(matches(withText("Salle C")));
+        onView(withRecyclerView(R.id.list_meetings).atPositionOnView(0, R.id.date_meeting))
+                .check(matches(withText("12/06/2023")));
     }
 
     @Test

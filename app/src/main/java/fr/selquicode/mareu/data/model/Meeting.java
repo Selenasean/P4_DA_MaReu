@@ -8,38 +8,51 @@ import java.util.Objects;
 
 /**
  * Model object representing a Meeting
- * */
+ */
 public class Meeting {
 
-    /** Meeting's id */
+    /**
+     * Meeting's id
+     */
     private long id;
 
-    /** Meeting's date */
+    /**
+     * Meeting's date
+     */
     private LocalDate date;
 
-    /** meeting's hour */
+    /**
+     * meeting's hour
+     */
     private LocalTime hour;
 
-    /** place of meeting */
+    /**
+     * place of meeting
+     */
     private Room room;
 
-    /** subject */
+    /**
+     * subject
+     */
     private String subject;
 
-    /** participants  */
+    /**
+     * participants
+     */
     private List<String> members;
 
 
     /**
      * Constructor meeting model
      *
-     * @param date
-     * @param hour
-     * @param room
-     * @param subject
-     * @param members
+     * @param id      of meeting type long
+     * @param date    of meeting -type LocalDate-
+     * @param hour    of meeting -type LocalTime-
+     * @param room    of meeting -type Room-
+     * @param subject of meeting -type String-
+     * @param members of meeting -type List of String-
      */
-    public Meeting(long id, LocalDate date,LocalTime hour, Room room, String subject, List<String> members){
+    public Meeting(long id, LocalDate date, LocalTime hour, Room room, String subject, List<String> members) {
         this.id = id;
         this.date = date;
         this.hour = hour;

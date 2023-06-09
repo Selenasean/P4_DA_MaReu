@@ -26,7 +26,8 @@ public class RoomDialogFragment extends DialogFragment {
 
     /**
      * Create and return a new instance of this fragment
-     * @return @{@link RoomDialogFragment}
+     *
+     * @return a DialogFragment
      */
     @NonNull
     public static RoomDialogFragment newInstance() {
@@ -35,8 +36,9 @@ public class RoomDialogFragment extends DialogFragment {
 
     /**
      * Called to init OnSelectedRoomListener
-     * & remind to implement listener into fragment's Activity root
-     * @param context
+     * And remind to implement listener into fragment's Activity root
+     *
+     * @param context of the fragment's activity
      */
     @Override
     public void onAttach(@NonNull Context context) {

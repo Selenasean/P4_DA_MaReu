@@ -1,18 +1,18 @@
 package fr.selquicode.mareu.ui.list;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.DividerItemDecoration;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.app.DatePickerDialog;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -22,9 +22,9 @@ import java.util.Calendar;
 import fr.selquicode.mareu.R;
 import fr.selquicode.mareu.databinding.ActivityMeetingsBinding;
 import fr.selquicode.mareu.ui.create.CreateMeetingActivity;
-import fr.selquicode.mareu.ui.utils.injection.ViewModelFactory;
 import fr.selquicode.mareu.ui.list.filter_room.OnSelectedRoomListener;
 import fr.selquicode.mareu.ui.list.filter_room.RoomDialogFragment;
+import fr.selquicode.mareu.ui.utils.injection.ViewModelFactory;
 
 public class MeetingsActivity extends AppCompatActivity implements OnMeetingClickedListener, OnSelectedRoomListener {
 
@@ -54,22 +54,22 @@ public class MeetingsActivity extends AppCompatActivity implements OnMeetingClic
     private void setViewModel() {
         meetingsViewModel = new ViewModelProvider(this, ViewModelFactory.getInstance()).get(MeetingsViewModel.class);
         meetingsViewModel.getMeetings().observe(this, listViewState -> {
-                mListAdapter.submitList(listViewState);
-                if(mListAdapter.getCurrentList().size() == 0){
-                    binding.noMeetingFounded.setVisibility(View.VISIBLE);
-                    binding.noMeetingFounded.setText(R.string.no_meeting);
-                    binding.listMeetings.setVisibility(View.GONE);
-                }else{
-                    binding.noMeetingFounded.setVisibility(View.GONE);
-                    binding.listMeetings.setVisibility(View.VISIBLE);
-                }
-            });
+            mListAdapter.submitList(listViewState);
+            if (mListAdapter.getCurrentList().size() == 0) {
+                binding.noMeetingFounded.setVisibility(View.VISIBLE);
+                binding.noMeetingFounded.setText(R.string.no_meeting);
+                binding.listMeetings.setVisibility(View.GONE);
+            } else {
+                binding.noMeetingFounded.setVisibility(View.GONE);
+                binding.listMeetings.setVisibility(View.VISIBLE);
+            }
+        });
     }
 
     /**
      * Settings for Recycleview
      */
-    private void setRecycleView(){
+    private void setRecycleView() {
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(this, DividerItemDecoration.VERTICAL);
         RecyclerView mRecycleView = binding.listMeetings;
         mRecycleView.addItemDecoration(dividerItemDecoration);
@@ -85,7 +85,8 @@ public class MeetingsActivity extends AppCompatActivity implements OnMeetingClic
 
     /**
      * Called to linked layout and menu
-     * @param menu  in which you place your items.
+     *
+     * @param menu in which you place your items.
      * @return boolean
      */
     @Override
@@ -98,9 +99,9 @@ public class MeetingsActivity extends AppCompatActivity implements OnMeetingClic
     /**
      * Called to know which item user selected,
      * and execute a method according to it
-     * @param item that was selected.
      *
-     * @return
+     * @param item that was selected.
+     * @return methods according to the item's choice
      */
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
@@ -114,7 +115,7 @@ public class MeetingsActivity extends AppCompatActivity implements OnMeetingClic
             case R.id.filter_return:
                 resetFilter();
                 return true;
-            default :
+            default:
                 return super.onOptionsItemSelected(item);
         }
     }
@@ -135,7 +136,8 @@ public class MeetingsActivity extends AppCompatActivity implements OnMeetingClic
 
     /**
      * Listener from room selected on FragmentDialog
-     * @param room
+     *
+     * @param room selected -type String-
      */
     @Override
     public void onSelectedRoom(String room) {
@@ -155,7 +157,7 @@ public class MeetingsActivity extends AppCompatActivity implements OnMeetingClic
 
         DatePickerDialog datePickerDialog = new DatePickerDialog(this,
                 (view, year, month, dayOfMonth) -> {
-                    LocalDate date = meetingsViewModel.formatDate(year, (month +1),dayOfMonth);
+                    LocalDate date = meetingsViewModel.formatDate(year, (month + 1), dayOfMonth);
                     meetingsViewModel.filterByDate(date);
                 },
                 mYear,

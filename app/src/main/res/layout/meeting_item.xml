@@ -127,6 +127,7 @@
     <ImageView
         android:id="@+id/deleteBtn"
         android:clickable="true"
+        android:focusable="true"
         android:layout_width="48dp"
         android:layout_height="48dp"
         app:layout_constraintBottom_toBottomOf="parent"

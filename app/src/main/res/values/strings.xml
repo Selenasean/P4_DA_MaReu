@@ -28,4 +28,7 @@
 
     <!-- String message for meeting list -->
     <string name="no_meeting"> Pas de réunion trouvée </string>
+    <string name="emoji_magic">emoji baguette magique</string>
+    <string name="button_add_email">bouton ajouter un email de participant</string>
+    <string name="button_create">bouton pour créer une réunion</string>
 </resources>

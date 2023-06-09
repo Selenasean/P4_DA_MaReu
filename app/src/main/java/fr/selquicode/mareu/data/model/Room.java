@@ -7,7 +7,7 @@ import fr.selquicode.mareu.R;
 
 public enum Room {
 
-    ROOM1("Salle A",R.drawable.room_ananas),
+    ROOM1("Salle A", R.drawable.room_ananas),
     ROOM2("Salle B", R.drawable.room_banane),
     ROOM3("Salle C", R.drawable.room_clementine),
     ROOM4("Salle D", R.drawable.room_durian),
@@ -23,23 +23,23 @@ public enum Room {
     @DrawableRes
     private final int color;
 
-    Room(String name, int color){
+    Room(String name, int color) {
         this.name = name;
         this.color = color;
     }
 
     @DrawableRes
-    public int getRoomColor(){
+    public int getRoomColor() {
         return color;
     }
 
-    public String getRoomName(){
+    public String getRoomName() {
         return name;
     }
 
     @NonNull
     @Override
-    public String toString(){
+    public String toString() {
         return name;
     }
 }
