@@ -1,4 +1,4 @@
-# MaRéu App
+# 📅 MaRéu App
 
 This repository contains a mini-application written in Java for P4 of the Android OpenClassrooms route.
 
