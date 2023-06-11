@@ -209,6 +209,7 @@ public class CreateMeetingActivity extends AppCompatActivity {
             if (createMeetingViewModel.isEmailValid(emailInput.getEditableText().toString())) {
                 createMeetingViewModel.onEmailAdded(emailInput.getEditableText().toString());
                 emailInput.setText("");
+                binding.participantsLyt.setError(null);
             } else {
                 if (!emailInput.toString().isEmpty()) {
                     binding.participantsLyt.setError(getString(R.string.error_email));
