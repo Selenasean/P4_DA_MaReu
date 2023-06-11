@@ -96,7 +96,9 @@ public class CreateMeetingActivity extends AppCompatActivity {
      */
     private void render(@NonNull CreateMeetingViewState state) {
         //refresh UI
-        binding.chooseRoomTextV.setText(state.getRoomName());
+        if(!Objects.requireNonNull(binding.chooseRoomTextV.getText()).toString().equals(state.getRoomName())){
+            binding.chooseRoomTextV.setText(state.getRoomName());
+        }
         binding.datepicker.setText(state.getDate());
         binding.timepicker.setText(state.getHour());
         if (!Objects.requireNonNull(binding.subject.getText()).toString().equals(state.getSubject())) {
@@ -122,8 +124,8 @@ public class CreateMeetingActivity extends AppCompatActivity {
         for (Room room : Room.values()) {
             roomList.add(room.getRoomName());
         }
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, roomList);
-        binding.chooseRoomTextV.setAdapter(adapter);
+//        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, roomList);
+        binding.chooseRoomTextV.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, roomList));
     }
 
     /**
